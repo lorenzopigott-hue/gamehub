@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiny Farm Simulator</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #87ceeb;
+  color: #263238;
+}
+
+header {
+  background: #4caf50;
+  color: white;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,.2);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.stat {
+  background: rgba(255,255,255,.2);
+  padding: 8px 14px;
+  border-radius: 20px;
+}
+
+main {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 15px;
+}
+
+.panel {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 15px;
+  cursor: pointer;
+  background: #4caf50;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+button.active {
+  background: #ff9800;
+}
+
+button.shop {
+  background: #795548;
+}
+
+button.sleep {
+  background: #3949ab;
+}
+
+button.danger {
+  background: #e53935;
+}
+
+.crop-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.crop-button {
+  background: #8bc34a;
+}
+
+.crop-button.selected {
+  background: #ff9800;
+}
+
+#farm {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.plot {
+  min-height: 135px;
+  background: #8d6e63;
+  border: 4px solid #6d4c41;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.plot:hover {
+  transform: scale(1.03);
+}
+
+.plot.empty {
+  background: #a1887f;
+}
+
+.plot.watered {
+  background: #607d8b;
+}
+
+.plot.ready {
+  border-color: #ffd600;
+  box-shadow: 0 0 12px #ffd600;
+}
+
+.crop {
+  font-size: 45px;
+  margin: 5px;
+}
+
+.plot-name {
+  color: white;
+  font-weight: bold;
+}
+
+.progress {
+  height: 10px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #4caf50;
+  width: 0%;
+}
+
+.shop-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.shop-item {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 14px;
+  min-width: 180px;
+  flex: 1;
+}
+
+#message {
+  min-height: 25px;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.log {
+  background: #263238;
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.log p {
+  margin: 5px 0;
+}
+
+.weather {
+  font-size: 20px;
+}
+
+.instructions {
+  background: #fff8e1;
+  border-left: 5px solid #ffb300;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+@media (max-width: 700px) {
+  #farm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plot {
+    min-height: 120px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🌱 Tiny Farm Simulator</h1>
+
+  <div class="stats">
+    <div class="stat">📅 Day: <span id="day">1</span></div>
+    <div class="stat">💰 $<span id="money">50</span></div>
+    <div class="stat">🌱 Seeds: <span id="seeds">10</span></div>
+    <div class="stat">💧 Water: <span id="water">10</span></div>
+    <div class="stat">⭐ XP: <span id="xp">0</span></div>
+    <div class="stat weather">☀️ <span id="weather">Sunny</span></div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <h2>🎮 How to Play</h2>
+
+    <div class="instructions">
+      <p><b>1.</b> Choose a crop.</p>
+      <p><b>2.</b> Select Plant and click an empty plot.</p>
+      <p><b>3.</b> Select Water and click your crop.</p>
+      <p><b>4.</b> Click Sleep to move to the next day.</p>
+      <p><b>5.</b> Keep crops watered until they are ready.</p>
+      <p><b>6.</b> Harvest mature crops and sell them for money!</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>🛠️ Tools</h2>
+
+    <div class="controls">
+      <button id="plantTool" class="active" onclick="setTool('plant')">
+        🌱 Plant
+      </button>
+
+      <button id="waterTool" onclick="setTool('water')">
+        💧 Water
+      </button>
+
+      <button id="harvestTool" onclick="setTool('harvest')">
+        🧺 Harvest
+      </button>
+
+      <button class="sleep" onclick="nextDay()">
+        😴 Sleep / Next Day
+      </button>
+    </div>
+
+    <h3>Choose Crop</h3>
+
+    <div class="crop-select">
+
+      <button
+        class="crop-button selected"
+        id="wheatButton"
+        onclick="chooseCrop('wheat')">
+        🌾 Wheat - $18
+      </button>
+
+      <button
+        class="crop-button"
+        id="carrotButton"
+        onclick="chooseCrop('carrot')">
+        🥕 Carrot - $28
+      </button>
+
+      <button
+        class="crop-button"
+        id="pumpkinButton"
+        onclick="chooseCrop('pumpkin')">
+        🎃 Pumpkin - $50
+      </button>
+
+      <button
+        class="crop-button"
+        id="cornButton"
+        onclick="chooseCrop('corn')">
+        🌽 Corn - $38
+      </button>
+
+    </div>
+
+    <p id="message"></p>
+  </div>
+
+  <div class="panel">
+    <h2>🚜 Your Farm</h2>
+    <div id="farm"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🏪 Farm Shop</h2>
+
+    <div class="shop-grid">
+
+      <div class="shop-item">
+        <h3>🌱 Seeds</h3>
+        <p>Buy 5 seeds</p>
+        <button class="shop" onclick="buySeeds()">
+          Buy for $10
+        </button>
+      </div>
+
+      <div class="shop-item">
+        <h3>💧 Water</h3>
+        <p>Buy 5 water</p>
+        <button class="shop" onclick="buyWater()">
+          Buy for $5
+        </button>
+      </div>
+
+      <div class="shop-item">
+        <h3>🌳 Farm Expansion</h3>
+        <p>Add 5 more plots</p>
+        <button class="shop" onclick="expandFarm()">
+          Expand for $75
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📜 Farm Log</h2>
+    <div class="log" id="log"></div>
+  </div>
+
+</main>
+
+<script>
+
+const crops = {
+
+  wheat: {
+    name: "Wheat",
+    emoji: "🌾",
+    days: 2,
+    value: 18
+  },
+
+  carrot: {
+    name: "Carrot",
+    emoji: "🥕",
+    days: 3,
+    value: 28
+  },
+
+  pumpkin: {
+    name: "Pumpkin",
+    emoji: "🎃",
+    days: 4,
+    value: 50
+  },
+
+  corn: {
+    name: "Corn",
+    emoji: "🌽",
+    days: 3,
+    value: 38
+  }
+
+};
+
+let game = {
+
+  day: 1,
+
+  money: 50,
+
+  seeds: 10,
+
+  water: 10,
+
+  xp: 0,
+
+  tool: "plant",
+
+  selectedCrop: "wheat",
+
+  weather: "Sunny",
+
+  plots: []
+
+};
+
+
+// Start with 10 plots
+for (let i = 0; i < 10; i++) {
+
+  game.plots.push({
+    crop: null,
+    age: 0,
+    watered: false
+  });
+
+}
+
+
+function saveGame() {
+
+  localStorage.setItem(
+    "tinyFarmSave",
+    JSON.stringify(game)
+  );
+
+}
+
+
+function loadGame() {
+
+  const saved = localStorage.getItem("tinyFarmSave");
+
+  if (saved) {
+
+    game = JSON.parse(saved);
+
+  }
+
+}
+
+
+function log(message) {
+
+  const logBox = document.getElementById("log");
+
+  const entry = document.createElement("p");
+
+  entry.textContent = "• " + message;
+
+  logBox.prepend(entry);
+
+}
+
+
+function message(text) {
+
+  document.getElementById("message").textContent = text;
+
+}
+
+
+function updateStats() {
+
+  document.getElementById("day").textContent =
+    game.day;
+
+  document.getElementById("money").textContent =
+    game.money;
+
+  document.getElementById("seeds").textContent =
+    game.seeds;
+
+  document.getElementById("water").textContent =
+    game.water;
+
+  document.getElementById("xp").textContent =
+    game.xp;
+
+  document.getElementById("weather").textContent =
+    game.weather === "Rain"
+      ? "🌧️ Rain"
+      : "☀️ Sunny";
+
+}
+
+
+function renderFarm() {
+
+  const farm = document.getElementById("farm");
+
+  farm.innerHTML = "";
+
+  game.plots.forEach((plot, index) => {
+
+    const div = document.createElement("div");
+
+    div.className = "plot";
+
+    if (!plot.crop) {
+
+      div.classList.add("empty");
+
+      div.innerHTML = `
+        <div class="crop">🟫</div>
+        <div class="plot-name">
+          Empty Plot ${index + 1}
+        </div>
+        <small>Click to plant</small>
+      `;
+
+    } else {
+
+      const crop = crops[plot.crop];
+
+      const percent =
+        Math.min(
+          100,
+          (plot.age / crop.days) * 100
+        );
+
+      if (plot.watered) {
+
+        div.classList.add("watered");
+
+      }
+
+      if (plot.age >= crop.days) {
+
+        div.classList.add("ready");
+
+      }
+
+      div.innerHTML = `
+
+        <div class="crop">
+          ${crop.emoji}
+        </div>
+
+        <div class="plot-name">
+          ${crop.name}
+        </div>
+
+        <small>
+          Day ${plot.age}/${crop.days}
+        </small>
+
+        <div class="progress">
+          <div
+            class="progress-bar"
+            style="width:${percent}%">
+          </div>
+        </div>
+
+        <small>
+          ${plot.watered ? "💧 Watered" : "🏜️ Needs water"}
+        </small>
+
+        ${
+          plot.age >= crop.days
+          ? "<br><b>✨ READY!</b>"
+          : ""
+        }
+
+      `;
+
+    }
+
+    div.onclick = () => {
+
+      usePlot(index);
+
+    };
+
+    farm.appendChild(div);
+
+  });
+
+}
+
+
+function usePlot(index) {
+
+  const plot = game.plots[index];
+
+  if (game.tool === "plant") {
+
+    if (plot.crop) {
+
+      message("That plot already has a crop!");
+
+      return;
+
+    }
+
+    if (game.seeds <= 0) {
+
+      message("You need more seeds!");
+
+      return;
+
+    }
+
+    plot.crop = game.selectedCrop;
+
+    plot.age = 0;
+
+    plot.watered = false;
+
+    game.seeds--;
+
+    const crop = crops[game.selectedCrop];
+
+    message(
+      `You planted ${crop.name}!`
+    );
+
+    log(
+      `You planted ${crop.name} on plot ${index + 1}.`
+    );
+
+  }
+
+
+  else if (game.tool === "water") {
+
+    if (!plot.crop) {
+
+      message("There is nothing planted here!");
+
+      return;
+
+    }
+
+    if (plot.watered) {
+
+      message("This crop is already watered!");
+
+      return;
+
+    }
+
+    if (game.water <= 0) {
+
+      message("You are out of water!");
+
+      return;
+
+    }
+
+    game.water--;
+
+    plot.watered = true;
+
+    message("💧 Crop watered!");
+
+    log(
+      `You watered plot ${index + 1}.`
+    );
+
+  }
+
+
+  else if (game.tool === "harvest") {
+
+    if (!plot.crop) {
+
+      message("There is nothing to harvest!");
+
+      return;
+
+    }
+
+    const crop = crops[plot.crop];
+
+    if (plot.age < crop.days) {
+
+      message(
+        `${crop.name} isn't ready yet!`
+      );
+
+      return;
+
+    }
+
+    game.money += crop.value;
+
+    game.xp += 10;
+
+    message(
+      `You harvested ${crop.name} for $${crop.value}!`
+    );
+
+    log(
+      `Harvested ${crop.name} for $${crop.value}.`
+    );
+
+    plot.crop = null;
+
+    plot.age = 0;
+
+    plot.watered = false;
+
+  }
+
+  update();
+
+}
+
+
+function setTool(tool) {
+
+  game.tool = tool;
+
+  document
+    .getElementById("plantTool")
+    .classList.remove("active");
+
+  document
+    .getElementById("waterTool")
+    .classList.remove("active");
+
+  document
+    .getElementById("harvestTool")
+    .classList.remove("active");
+
+  if (tool === "plant") {
+
+    document
+      .getElementById("plantTool")
+      .classList.add("active");
+
+  }
+
+  if (tool === "water") {
+
+    document
+      .getElementById("waterTool")
+      .classList.add("active");
+
+  }
+
+  if (tool === "harvest") {
+
+    document
+      .getElementById("harvestTool")
+      .classList.add("active");
+
+  }
+
+  message(
+    `Tool selected: ${tool}`
+  );
+
+}
+
+
+function chooseCrop(cropName) {
+
+  game.selectedCrop = cropName;
+
+  document
+    .querySelectorAll(".crop-button")
+    .forEach(button => {
+
+      button.classList.remove("selected");
+
+    });
+
+  document
+    .getElementById(cropName + "Button")
+    .classList.add("selected");
+
+  message(
+    `Selected ${crops[cropName].name}.`
+  );
+
+}
+
+
+function nextDay() {
+
+  let grown = 0;
+
+  game.plots.forEach(plot => {
+
+    if (!plot.crop) {
+
+      return;
+
+    }
+
+    if (plot.watered) {
+
+      plot.age++;
+
+      plot.watered = false;
+
+      grown++;
+
+    }
+
+  });
+
+
+  // Random weather
+  if (Math.random() < 0.30) {
+
+    game.weather = "Rain";
+
+    game.water += 3;
+
+    game.plots.forEach(plot => {
+
+      if (plot.crop) {
+
+        plot.watered = true;
+
+      }
+
+    });
+
+    log(
+      "🌧️ It rained! Your crops were watered."
+    );
+
+  } else {
+
+    game.weather = "Sunny";
+
+  }
+
+
+  game.day++;
+
+  message(
+    `Day ${game.day} has started!`
+  );
+
+  log(
+    `Day ${game.day} started.`
+  );
+
+  if (grown > 0) {
+
+    log(
+      `${grown} watered crop(s) grew.`
+    );
+
+  }
+
+  update();
+
+}
+
+
+function buySeeds() {
+
+  if (game.money < 10) {
+
+    message("You don't have enough money!");
+
+    return;
+
+  }
+
+  game.money -= 10;
+
+  game.seeds += 5;
+
+  message("🌱 You bought 5 seeds!");
+
+  log("Bought 5 seeds for $10.");
+
+  update();
+
+}
+
+
+function buyWater() {
+
+  if (game.money < 5) {
+
+    message("You don't have enough money!");
+
+    return;
+
+  }
+
+  game.money -= 5;
+
+  game.water += 5;
+
+  message("💧 You bought 5 water!");
+
+  log("Bought 5 water for $5.");
+
+  update();
+
+}
+
+
+function expandFarm() {
+
+  if (game.plots.length >= 20) {
+
+    message(
+      "Your farm is already at maximum size!"
+    );
+
+    return;
+
+  }
+
+  if (game.money < 75) {
+
+    message(
+      "You need $75 to expand your farm!"
+    );
+
+    return;
+
+  }
+
+  game.money -= 75;
+
+  for (let i = 0; i < 5; i++) {
+
+    if (game.plots.length < 20) {
+
+      game.plots.push({
+
+        crop: null,
+
+        age: 0,
+
+        watered: false
+
+      });
+
+    }
+
+  }
+
+  message("🚜 Your farm expanded!");
+
+  log(
+    "You expanded your farm by 5 plots."
+  );
+
+  update();
+
+}
+
+
+function update() {
+
+  updateStats();
+
+  renderFarm();
+
+  saveGame();
+
+}
+
+
+loadGame();
+
+update();
+
+log("🌱 Welcome to Tiny Farm!");
+
+</script>
+
+</body>
+</html>
