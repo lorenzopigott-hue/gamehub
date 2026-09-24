@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Racer</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111827;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 20px;
+    }
+
+    #game {
+      position: relative;
+      width: 400px;
+      height: 600px;
+      max-width: 90vw;
+      margin: auto;
+      background: #333;
+      overflow: hidden;
+      border: 4px solid white;
+    }
+
+    #player {
+      position: absolute;
+      width: 45px;
+      height: 70px;
+      background: red;
+      bottom: 20px;
+      left: 177px;
+      border-radius: 8px;
+    }
+
+    .enemy {
+      position: absolute;
+      width: 45px;
+      height: 70px;
+      background: yellow;
+      border-radius: 8px;
+    }
+
+    #score {
+      font-size: 24px;
+      margin: 10px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🏎️ Pixel Racer</h1>
+
+  <div id="score">Score: 0</div>
+
+  <div id="game">
+    <div id="player"></div>
+  </div>
+
+  <button onclick="restartGame()">Restart</button>
+
+  <script>
+    const player = document.getElementById("player");
+    const game = document.getElementById("game");
+    const scoreText = document.getElementById("score");
+
+    let playerX = 177;
+    let score = 0;
+    let gameOver = false;
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowLeft" && playerX > 0) {
+        playerX -= 20;
+      }
+
+      if (event.key === "ArrowRight" && playerX < 355) {
+        playerX += 20;
+      }
+
+      player.style.left = playerX + "px";
+    });
+
+    function createEnemy() {
+      if (gameOver) return;
+
+      const enemy = document.createElement("div");
+      enemy.className = "enemy";
+
+      let enemyX = Math.floor(Math.random() * 355);
+      let enemyY = -70;
+
+      enemy.style.left = enemyX + "px";
+      enemy.style.top = enemyY + "px";
+
+      game.appendChild(enemy);
+
+      const move = setInterval(function() {
+        if (gameOver) {
+          clearInterval(move);
+          enemy.remove();
+          return;
+        }
+
+        enemyY += 5;
+        enemy.style.top = enemyY + "px";
+
+        const playerRect = player.getBoundingClientRect();
+        const enemyRect = enemy.getBoundingClientRect();
+
+        if (
+          playerRect.left < enemyRect.right &&
+          playerRect.right > enemyRect.left &&
+          playerRect.top < enemyRect.bottom &&
+          playerRect.bottom > enemyRect.top
+        ) {
+          gameOver = true;
+          alert("Game Over! Score: " + score);
+          clearInterval(move);
+        }
+
+        if (enemyY > 600) {
+          clearInterval(move);
+          enemy.remove();
+
+          score++;
+          scoreText.textContent = "Score: " + score;
+        }
+      }, 30);
+    }
+
+    setInterval(createEnemy, 1200);
+
+    function restartGame() {
+      location.reload();
+    }
+  </script>
+
+</body>
+</html>
