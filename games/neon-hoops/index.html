@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Hoops</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background:
+        radial-gradient(circle at 50% 20%, #18204d 0%, #080b1c 45%, #03040b 100%);
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#game {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* TOP BAR */
+
+#topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    background: rgba(5, 8, 25, .9);
+    border-bottom: 2px solid #00ffff;
+    box-shadow: 0 0 20px #00ffff88;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 50;
+}
+
+.stat {
+    text-align: center;
+    min-width: 100px;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #80ffff;
+    text-transform: uppercase;
+}
+
+.statValue {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#score {
+    color: #00ffff;
+}
+
+#combo {
+    color: #ff4df3;
+}
+
+#timer {
+    color: #ffff00;
+}
+
+/* COURT */
+
+#court {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 75px;
+    bottom: 0;
+    background:
+        linear-gradient(rgba(0,255,255,.04) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0,255,255,.04) 2px, transparent 2px),
+        radial-gradient(circle at 50% 80%, #162b50, #080b19 70%);
+    background-size: 50px 50px;
+}
+
+/* COURT FLOOR */
+
+#floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 35%;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            rgba(0,255,255,.05) 0px,
+            rgba(0,255,255,.05) 2px,
+            transparent 2px,
+            transparent 100px
+        ),
+        linear-gradient(#0c1730, #050914);
+    border-top: 2px solid #00ffff66;
+}
+
+/* THREE POINT ARC */
+
+#arc {
+    position: absolute;
+    width: 520px;
+    height: 250px;
+    border: 3px solid #ff00dd88;
+    border-bottom: none;
+    border-radius: 500px 500px 0 0;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%);
+}
+
+/* HOOP */
+
+#hoop {
+    position: absolute;
+    width: 170px;
+    height: 150px;
+    left: 50%;
+    top: 90px;
+    transform: translateX(-50%);
+    transition: left .15s;
+    z-index: 15;
+}
+
+#backboard {
+    position: absolute;
+    width: 115px;
+    height: 75px;
+    left: 27px;
+    top: 0;
+    border: 4px solid white;
+    background: rgba(0,255,255,.08);
+    box-shadow:
+        0 0 12px #00ffff,
+        inset 0 0 15px #00ffff44;
+}
+
+#backboard::after {
+    content: "";
+    position: absolute;
+    width: 55px;
+    height: 38px;
+    left: 26px;
+    bottom: 5px;
+    border: 3px solid #ff4df3;
+    box-shadow: 0 0 10px #ff4df3;
+}
+
+#rim {
+    position: absolute;
+    width: 80px;
+    height: 25px;
+    border: 7px solid #ff4d00;
+    border-radius: 50%;
+    left: 45px;
+    top: 70px;
+    box-shadow: 0 0 18px #ff4d00;
+    background: rgba(255,100,0,.1);
+}
+
+#net {
+    position: absolute;
+    left: 51px;
+    top: 86px;
+    width: 68px;
+    height: 48px;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    border-bottom: 3px solid white;
+    clip-path: polygon(0 0,100% 0,80% 100%,20% 100%);
+    opacity: .7;
+}
+
+/* BALL */
+
+#ball {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%, #fff 0 5%, #ff9b00 6% 30%, #ff6200 31% 100%);
+    box-shadow:
+        0 0 10px #ff7100,
+        0 0 25px #ff4500;
+    z-index: 30;
+    display: none;
+}
+
+#ball::before {
+    content: "";
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    border-right: 3px solid #331000;
+    border-radius: 50%;
+    transform: rotate(35deg);
+}
+
+#ball::after {
+    content: "";
+    position: absolute;
+    width: 45px;
+    height: 10px;
+    top: 18px;
+    border-top: 3px solid #331000;
+    border-radius: 50%;
+}
+
+/* PLAYER */
+
+#player {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 125px;
+    z-index: 20;
+}
+
+.head {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #ffb37a;
+    margin: auto;
+    border: 3px solid #111;
+}
+
+.body {
+    width: 65px;
+    height: 65px;
+    margin: -2px auto;
+    background: linear-gradient(135deg,#ff00dd,#5a00ff);
+    border-radius: 15px 15px 8px 8px;
+    box-shadow: 0 0 20px #ff00dd;
+}
+
+.leg {
+    position: absolute;
+    width: 18px;
+    height: 50px;
+    background: #202050;
+    bottom: 0;
+    border-radius: 10px;
+}
+
+.leg.left {
+    left: 22px;
+}
+
+.leg.right {
+    right: 22px;
+}
+
+/* POWER BAR */
+
+#powerContainer {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 18px;
+    border: 2px solid white;
+    border-radius: 20px;
+    overflow: hidden;
+    z-index: 60;
+}
+
+#power {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg,#00ffff,#ff00dd,#ffff00);
+}
+
+/* CROSSHAIR */
+
+#aim {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border: 2px solid #00ffff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 70;
+    box-shadow: 0 0 12px #00ffff;
+    display: none;
+}
+
+#aim::before,
+#aim::after {
+    content: "";
+    position: absolute;
+    background: #00ffff;
+}
+
+#aim::before {
+    width: 50px;
+    height: 2px;
+    top: 15px;
+    left: -9px;
+}
+
+#aim::after {
+    width: 2px;
+    height: 50px;
+    left: 15px;
+    top: -9px;
+}
+
+/* MESSAGE */
+
+#message {
+    position: absolute;
+    top: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow:
+        0 0 8px #00ffff,
+        0 0 20px #ff00dd;
+    z-index: 80;
+    pointer-events: none;
+}
+
+/* START SCREEN */
+
+#startScreen,
+#gameOver {
+    position: absolute;
+    inset: 0;
+    background: rgba(2,4,15,.96);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+#startScreen h1,
+#gameOver h1 {
+    font-size: 60px;
+    margin: 0;
+    color: #00ffff;
+    text-shadow:
+        0 0 10px #00ffff,
+        0 0 30px #ff00dd;
+}
+
+.subtitle {
+    color: #ff4df3;
+    font-size: 18px;
+    margin: 10px 0 30px;
+}
+
+button {
+    background: linear-gradient(135deg,#00ffff,#ff00dd);
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 14px 30px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #00ffff88;
+    margin: 7px;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.instructions {
+    max-width: 550px;
+    text-align: center;
+    color: #ccc;
+    line-height: 1.7;
+}
+
+/* DIFFICULTY */
+
+#difficulty {
+    margin-bottom: 20px;
+}
+
+.selected {
+    outline: 3px solid white;
+}
+
+/* MOBILE */
+
+#shootButton {
+    position: absolute;
+    bottom: 55px;
+    right: 25px;
+    z-index: 100;
+    display: none;
+}
+
+@media(max-width:700px) {
+    #startScreen h1,
+    #gameOver h1 {
+        font-size: 40px;
+    }
+
+    #arc {
+        width: 350px;
+    }
+
+    #shootButton {
+        display: block;
+    }
+
+    .statValue {
+        font-size: 18px;
+    }
+
+    .stat {
+        min-width: 70px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="topbar">
+        <div class="stat">
+            <div class="statLabel">Score</div>
+            <div class="statValue" id="score">0</div>
+        </div>
+
+        <div class="stat">
+            <div class="statLabel">Combo</div>
+            <div class="statValue" id="combo">x0</div>
+        </div>
+
+        <div class="stat">
+            <div class="statLabel">Time</div>
+            <div class="statValue" id="timer">60</div>
+        </div>
+
+        <div class="stat">
+            <div class="statLabel">High Score</div>
+            <div class="statValue" id="highScore">0</div>
+        </div>
+    </div>
+
+    <div id="court">
+
+        <div id="arc"></div>
+
+        <div id="hoop">
+            <div id="backboard"></div>
+            <div id="rim"></div>
+            <div id="net"></div>
+        </div>
+
+        <div id="ball"></div>
+
+        <div id="player">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="leg left"></div>
+            <div class="leg right"></div>
+        </div>
+
+        <div id="floor"></div>
+
+        <div id="aim"></div>
+
+        <div id="message"></div>
+
+        <div id="powerContainer">
+            <div id="power"></div>
+        </div>
+
+        <button id="shootButton" onclick="shoot()">🏀 SHOOT</button>
+
+    </div>
+
+    <!-- START -->
+
+    <div id="startScreen">
+
+        <h1>NEON HOOPS</h1>
+
+        <div class="subtitle">
+            CYBER COURT CHALLENGE
+        </div>
+
+        <div id="difficulty">
+            <button onclick="setDifficulty('easy')" id="easyBtn">
+                EASY
+            </button>
+
+            <button onclick="setDifficulty('normal')" id="normalBtn" class="selected">
+                NORMAL
+            </button>
+
+            <button onclick="setDifficulty('hard')" id="hardBtn">
+                HARD
+            </button>
+        </div>
+
+        <div class="instructions">
+            <b>HOW TO PLAY</b><br><br>
+
+            Move your mouse to aim.<br>
+            Hold the mouse button to charge your shot.<br>
+            Release to shoot.<br><br>
+
+            🎯 Center shots score more points.<br>
+            🔥 Make consecutive baskets to build a combo.<br>
+            ⭐ Long shots are worth extra points.<br>
+            💥 Miss three times in a row and your combo resets.
+        </div>
+
+        <button onclick="startGame()">
+            ▶ START GAME
+        </button>
+
+    </div>
+
+    <!-- GAME OVER -->
+
+    <div id="gameOver" style="display:none">
+
+        <h1>TIME'S UP!</h1>
+
+        <div class="subtitle">
+            FINAL SCORE
+        </div>
+
+        <div id="finalScore"
+             style="font-size:50px;color:#ffff00;margin:20px;">
+            0
+        </div>
+
+        <div id="finalMessage"
+             style="font-size:20px;margin-bottom:20px;">
+        </div>
+
+        <button onclick="startGame()">
+            🔄 PLAY AGAIN
+        </button>
+
+        <button onclick="showStart()">
+            MENU
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+let score = 0;
+let combo = 0;
+let timeLeft = 60;
+let highScore = Number(localStorage.getItem("neonHoopsHighScore")) || 0;
+
+let playing = false;
+let charging = false;
+let chargePower = 0;
+let chargeDirection = 1;
+
+let timerInterval;
+let hoopInterval;
+
+let difficulty = "normal";
+
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+
+const hoop = document.getElementById("hoop");
+const ball = document.getElementById("ball");
+const aim = document.getElementById("aim");
+const power = document.getElementById("power");
+
+document.getElementById("highScore").textContent = highScore;
+
+
+/* =========================
+   DIFFICULTY
+========================= */
+
+function setDifficulty(level) {
+
+    difficulty = level;
+
+    document.querySelectorAll("#difficulty button")
+        .forEach(b => b.classList.remove("selected"));
+
+    document.getElementById(level + "Btn")
+        .classList.add("selected");
+}
+
+
+/* =========================
+   START GAME
+========================= */
+
+function startGame() {
+
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameOver").style.display = "none";
+
+    score = 0;
+    combo = 0;
+    timeLeft = 60;
+
+    playing = true;
+
+    updateUI();
+
+    moveHoop();
+
+    clearInterval(timerInterval);
+    clearInterval(hoopInterval);
+
+    timerInterval = setInterval(() => {
+
+        if (!playing) return;
+
+        timeLeft--;
+
+        updateUI();
+
+        if (timeLeft <= 0) {
+            endGame();
+        }
+
+    }, 1000);
+
+    let speed = 1800;
+
+    if (difficulty === "easy") speed = 2400;
+    if (difficulty === "hard") speed = 1200;
+
+    hoopInterval = setInterval(moveHoop, speed);
+
+    showMessage("GET READY!");
+
+    setTimeout(() => {
+        if (playing) showMessage("");
+    }, 1200);
+}
+
+
+/* =========================
+   HOOP MOVEMENT
+========================= */
+
+function moveHoop() {
+
+    if (!playing) return;
+
+    const courtWidth = window.innerWidth;
+
+    let min = 100;
+    let max = courtWidth - 270;
+
+    if (difficulty === "hard") {
+        min = 60;
+        max = courtWidth - 220;
+    }
+
+    const x = min + Math.random() * (max - min);
+
+    hoop.style.left = x + "px";
+    hoop.style.transform = "none";
+}
+
+
+/* =========================
+   MOUSE AIM
+========================= */
+
+document.addEventListener("mousemove", e => {
+
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    if (!playing) return;
+
+    aim.style.display = "block";
+
+    aim.style.left =
+        (mouseX - 17) + "px";
+
+    aim.style.top =
+        (mouseY - 17) + "px";
+});
+
+
+/* =========================
+   CHARGE SHOT
+========================= */
+
+document.addEventListener("mousedown", e => {
+
+    if (!playing) return;
+
+    if (e.target.tagName === "BUTTON") return;
+
+    charging = true;
+
+    chargePower = 0;
+    chargeDirection = 1;
+
+    chargeLoop();
+});
+
+
+function chargeLoop() {
+
+    if (!charging) return;
+
+    chargePower += chargeDirection * 3;
+
+    if (chargePower >= 100) {
+        chargePower = 100;
+        chargeDirection = -1;
+    }
+
+    if (chargePower <= 0) {
+        chargePower = 0;
+        chargeDirection = 1;
+    }
+
+    power.style.width = chargePower + "%";
+
+    requestAnimationFrame(chargeLoop);
+}
+
+
+document.addEventListener("mouseup", e => {
+
+    if (!charging) return;
+
+    charging = false;
+
+    shoot();
+});
+
+
+/* =========================
+   SHOOT
+========================= */
+
+function shoot() {
+
+    if (!playing) return;
+
+    if (chargePower < 10) {
+        chargePower = 50;
+    }
+
+    power.style.width = "0%";
+
+    const rimRect =
+        document.getElementById("rim").getBoundingClientRect();
+
+    const targetX =
+        rimRect.left + rimRect.width / 2;
+
+    const targetY =
+        rimRect.top + rimRect.height / 2;
+
+    const distance =
+        Math.hypot(
+            mouseX - targetX,
+            mouseY - targetY
+        );
+
+    /*
+       Accuracy depends on
+       how close the aim is
+       to the hoop.
+    */
+
+    let accuracy = Math.max(
+        0,
+        1 - distance / 180
+    );
+
+    /*
+       Power also matters.
+    */
+
+    let powerAccuracy =
+        1 - Math.abs(chargePower - 65) / 100;
+
+    let chance =
+        accuracy * .75 +
+        powerAccuracy * .25;
+
+    if (difficulty === "easy")
+        chance += .15;
+
+    if (difficulty === "hard")
+        chance -= .12;
+
+    chance = Math.max(0, Math.min(1, chance));
+
+    const made = Math.random() < chance;
+
+    animateBall(
+        targetX,
+        targetY,
+        made
+    );
+}
+
+
+/* =========================
+   BALL ANIMATION
+========================= */
+
+function animateBall(targetX, targetY, made) {
+
+    const playerRect =
+        document.getElementById("player")
+        .getBoundingClientRect();
+
+    const startX =
+        playerRect.left + playerRect.width / 2;
+
+    const startY =
+        playerRect.top + 20;
+
+    ball.style.display = "block";
+
+    ball.style.left =
+        (startX - 24) + "px";
+
+    ball.style.top =
+        (startY - 24) + "px";
+
+    const startTime = performance.now();
+
+    const duration = 650;
+
+    function animate(now) {
+
+        const progress =
+            Math.min(
+                1,
+                (now - startTime) / duration
+            );
+
+        const x =
+            startX +
+            (targetX - startX) * progress;
+
+        const baseY =
+            startY +
+            (targetY - startY) * progress;
+
+        const arc =
+            Math.sin(progress * Math.PI) * -180;
+
+        const y =
+            baseY + arc;
+
+        ball.style.left =
+            (x - 24) + "px";
+
+        ball.style.top =
+            (y - 24) + "px";
+
+        ball.style.transform =
+            `rotate(${progress * 720}deg)`;
+
+        if (progress < 1) {
+
+            requestAnimationFrame(animate);
+
+        } else {
+
+            ball.style.display = "none";
+
+            if (made) {
+
+                scoreBasket();
+
+            } else {
+
+                missBasket();
+
+            }
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+
+/* =========================
+   SCORE
+========================= */
+
+function scoreBasket() {
+
+    combo++;
+
+    let points = 2;
+
+    /*
+       Combo bonus
+    */
+
+    points += Math.min(combo - 1, 10);
+
+    /*
+       Long shot
+    */
+
+    const playerRect =
+        document.getElementById("player")
+        .getBoundingClientRect();
+
+    const rimRect =
+        document.getElementById("rim")
+        .getBoundingClientRect();
+
+    const distance =
+        Math.abs(
+            playerRect.top -
+            rimRect.top
+        );
+
+    if (distance > 350) {
+
+        points += 3;
+
+        showMessage("🔥 LONG SHOT! +" + points);
+
+    } else {
+
+        showMessage("🏀 SWISH! +" + points);
+
+    }
+
+    score += points;
+
+    updateUI();
+
+    /*
+       Screen flash
+    */
+
+    document.body.style.background =
+        "#ffffff";
+
+    setTimeout(() => {
+
+        document.body.style.background =
+            "";
+
+    }, 70);
+}
+
+
+/* =========================
+   MISS
+========================= */
+
+function missBasket() {
+
+    combo = 0;
+
+    showMessage("MISS!");
+
+    updateUI();
+}
+
+
+/* =========================
+   UI
+========================= */
+
+function updateUI() {
+
+    document.getElementById("score")
+        .textContent = score;
+
+    document.getElementById("combo")
+        .textContent = "x" + combo;
+
+    document.getElementById("timer")
+        .textContent = timeLeft;
+
+    document.getElementById("highScore")
+        .textContent = highScore;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+let messageTimeout;
+
+function showMessage(text) {
+
+    const message =
+        document.getElementById("message");
+
+    message.textContent = text;
+
+    clearTimeout(messageTimeout);
+
+    messageTimeout = setTimeout(() => {
+
+        message.textContent = "";
+
+    }, 1000);
+}
+
+
+/* =========================
+   END GAME
+========================= */
+
+function endGame() {
+
+    playing = false;
+
+    clearInterval(timerInterval);
+    clearInterval(hoopInterval);
+
+    aim.style.display = "none";
+
+    if (score > highScore) {
+
+        highScore = score;
+
+        localStorage.setItem(
+            "neonHoopsHighScore",
+            highScore
+        );
+    }
+
+    document.getElementById("finalScore")
+        .textContent = score;
+
+    let message = "";
+
+    if (score >= 100) {
+        message = "🏆 LEGENDARY SHOOTER!";
+    } else if (score >= 60) {
+        message = "🔥 AMAZING GAME!";
+    } else if (score >= 30) {
+        message = "⭐ GREAT JOB!";
+    } else {
+        message = "🏀 KEEP PRACTICING!";
+    }
+
+    document.getElementById("finalMessage")
+        .textContent = message;
+
+    document.getElementById("gameOver")
+        .style.display = "flex";
+}
+
+
+/* =========================
+   MENU
+========================= */
+
+function showStart() {
+
+    playing = false;
+
+    clearInterval(timerInterval);
+    clearInterval(hoopInterval);
+
+    document.getElementById("gameOver")
+        .style.display = "none";
+
+    document.getElementById("startScreen")
+        .style.display = "flex";
+}
+
+
+/* =========================
+   KEYBOARD
+========================= */
+
+document.addEventListener("keydown", e => {
+
+    if (e.code === "Space") {
+
+        e.preventDefault();
+
+        if (playing && !charging) {
+
+            charging = true;
+            chargePower = 0;
+            chargeDirection = 1;
+
+            chargeLoop();
+        }
+    }
+});
+
+
+document.addEventListener("keyup", e => {
+
+    if (e.code === "Space") {
+
+        if (charging) {
+
+            charging = false;
+
+            shoot();
+        }
+    }
+});
+
+
+/* =========================
+   MOBILE TOUCH
+========================= */
+
+let touchStart = false;
+
+document.getElementById("shootButton")
+.addEventListener("touchstart", e => {
+
+    e.preventDefault();
+
+    if (!playing) return;
+
+    shoot();
+});
+
+
+/* =========================
+   RESIZE
+========================= */
+
+window.addEventListener("resize", () => {
+
+    if (playing) {
+        moveHoop();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
