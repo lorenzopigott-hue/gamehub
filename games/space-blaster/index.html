@@ -6,10 +6,6 @@
 <title>Space Blaster</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   background: #080b18;
@@ -23,32 +19,56 @@ h1 {
 }
 
 p {
-  color: #bfc7ff;
+  color: #c4ccff;
 }
 
 #info {
-  font-size: 20px;
+  font-size: 19px;
   margin: 10px;
 }
 
 canvas {
   display: block;
   margin: auto;
-  max-width: 95%;
+  max-width: 96%;
   background: #03050d;
   border: 3px solid #536dff;
   border-radius: 10px;
 }
 
 button {
-  margin: 15px;
-  padding: 10px 20px;
+  padding: 11px 18px;
+  margin: 8px;
   border: none;
   border-radius: 8px;
   background: #536dff;
   color: white;
   font-size: 16px;
   cursor: pointer;
+}
+
+#upgradeBox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.card {
+  background: #151a35;
+  border: 2px solid #6677ff;
+  border-radius: 14px;
+  padding: 22px;
+  width: min(500px, 90vw);
+}
+
+.card button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
 }
 </style>
 </head>
@@ -58,20 +78,43 @@ button {
 <h1>🚀 Space Blaster</h1>
 
 <p>
-Move with A/D or arrow keys. Shoot with SPACE.
+A/D or ←/→ to move • SPACE to shoot
 </p>
 
 <div id="info">
-Score: <span id="score">0</span>
-&nbsp; | &nbsp;
-Lives: <span id="lives">3</span>
-&nbsp; | &nbsp;
-Boss HP: <span id="bossHealth">--</span>
+Stage: <span id="stage">1</span> |
+Score: <span id="score">0</span> |
+Lives: <span id="lives">3</span> |
+Boss HP: <span id="bossHP">--</span>
 </div>
 
 <canvas id="game" width="800" height="500"></canvas>
 
 <button onclick="startGame()">Restart Game</button>
+
+<div id="upgradeBox">
+
+  <div class="card">
+
+    <h2>⭐ Choose Your Stage 2 Upgrade!</h2>
+
+    <p>Pick ONE upgrade:</p>
+
+    <button onclick="chooseUpgrade('rapid')">
+      ⚡ Rapid Fire
+    </button>
+
+    <button onclick="chooseUpgrade('power')">
+      💥 Power Shot
+    </button>
+
+    <button onclick="chooseUpgrade('triple')">
+      🔱 Triple Shot
+    </button>
+
+  </div>
+
+</div>
 
 <script>
 
@@ -80,40 +123,59 @@ const ctx = canvas.getContext("2d");
 
 const scoreText = document.getElementById("score");
 const livesText = document.getElementById("lives");
-const bossHealthText = document.getElementById("bossHealth");
+const stageText = document.getElementById("stage");
+const bossHPText = document.getElementById("bossHP");
+const upgradeBox = document.getElementById("upgradeBox");
+
+const keys = {};
 
 let player;
 let bullets;
 let enemies;
 let enemyBullets;
+let boss;
 
 let score;
 let lives;
+let stage;
+let upgrade;
+
 let gameOver;
+let gameMode;
 
-let boss;
-let bossFight;
+let lastShot;
+let enemyMove;
+let enemyDirection;
+let enemyShootTimer;
 
-const keys = {};
+
+/* CONTROLS */
 
 document.addEventListener("keydown", function(event) {
 
   keys[event.key.toLowerCase()] = true;
 
   if (event.code === "Space") {
+
     event.preventDefault();
 
-    if (!gameOver) {
+    if (gameMode === "playing") {
       shoot();
     }
+
   }
 
 });
 
+
 document.addEventListener("keyup", function(event) {
+
   keys[event.key.toLowerCase()] = false;
+
 });
 
+
+/* START */
 
 function startGame() {
 
@@ -129,111 +191,268 @@ function startGame() {
   enemies = [];
   enemyBullets = [];
 
+  boss = null;
+
   score = 0;
   lives = 3;
+  stage = 1;
+
+  upgrade = null;
+
   gameOver = false;
+  gameMode = "playing";
 
-  boss = null;
-  bossFight = false;
+  lastShot = 0;
 
-  createEnemies();
+  enemyMove = 0;
+  enemyDirection = 1;
+  enemyShootTimer = 0;
 
-  updateInfo();
+  upgradeBox.style.display = "none";
+
+  createEnemies(27);
+
+  updateUI();
 
   requestAnimationFrame(gameLoop);
 }
 
 
-function createEnemies() {
+/* CREATE ENEMIES */
 
-  for (let row = 0; row < 3; row++) {
+function createEnemies(amount) {
 
-    for (let column = 0; column < 9; column++) {
+  enemies = [];
 
-      enemies.push({
-        x: 80 + column * 75,
-        y: 60 + row * 55,
-        width: 42,
-        height: 28,
-        alive: true
-      });
+  let columns;
 
-    }
+  if (stage === 1) {
+    columns = 9;
+  } else {
+    columns = 12;
+  }
+
+  for (let i = 0; i < amount; i++) {
+
+    let column = i % columns;
+    let row = Math.floor(i / columns);
+
+    enemies.push({
+
+      x: 45 + column * 60,
+
+      y: 55 + row * 48,
+
+      width: 36,
+
+      height: 25,
+
+      alive: true
+
+    });
 
   }
 
 }
 
 
-function createBoss() {
+/* UPGRADE */
 
-  bossFight = true;
+function chooseUpgrade(type) {
 
-  boss = {
-    x: 300,
-    y: 55,
-    width: 200,
-    height: 90,
-    health: 30,
-    maxHealth: 30,
-    speed: 3,
-    direction: 1,
-    shootTimer: 0
-  };
+  upgrade = type;
+
+  upgradeBox.style.display = "none";
+
+  stage = 2;
+
+  gameMode = "playing";
 
   bullets = [];
 
-  updateInfo();
+  enemyBullets = [];
+
+  boss = null;
+
+  enemyMove = 0;
+
+  enemyDirection = 1;
+
+  enemyShootTimer = 0;
+
+  createEnemies(48);
+
+  updateUI();
+
+  requestAnimationFrame(gameLoop);
 
 }
 
 
+/* SHOOT */
+
 function shoot() {
 
+  let now = performance.now();
+
+  let fireDelay = 220;
+
+  if (upgrade === "rapid") {
+    fireDelay = 100;
+  }
+
+  if (now - lastShot < fireDelay) {
+    return;
+  }
+
+  lastShot = now;
+
+
+  /* TRIPLE SHOT */
+
+  if (upgrade === "triple") {
+
+    bullets.push({
+
+      x: player.x + 27,
+      y: player.y - 15,
+
+      width: 6,
+      height: 14,
+
+      speed: 10,
+
+      damage: 1
+
+    });
+
+
+    bullets.push({
+
+      x: player.x + 12,
+      y: player.y - 10,
+
+      width: 6,
+      height: 14,
+
+      speed: 10,
+
+      damage: 1
+
+    });
+
+
+    bullets.push({
+
+      x: player.x + 42,
+      y: player.y - 10,
+
+      width: 6,
+      height: 14,
+
+      speed: 10,
+
+      damage: 1
+
+    });
+
+    return;
+  }
+
+
+  /* NORMAL / POWER SHOT */
+
   bullets.push({
-    x: player.x + player.width / 2 - 3,
+
+    x: player.x + 27,
+
     y: player.y - 15,
+
     width: 6,
+
     height: 14,
-    speed: 9
+
+    speed: 10,
+
+    damage: upgrade === "power" ? 2 : 1
+
   });
 
 }
 
 
+/* COLLISION */
+
 function collision(a, b) {
 
   return (
+
     a.x < b.x + b.width &&
+
     a.x + a.width > b.x &&
+
     a.y < b.y + b.height &&
+
     a.y + a.height > b.y
+
   );
 
 }
 
 
-function updateInfo() {
+/* UI */
+
+function updateUI() {
 
   scoreText.textContent = score;
+
   livesText.textContent = lives;
 
-  if (bossFight && boss) {
-    bossHealthText.textContent =
+  stageText.textContent = stage;
+
+  if (boss) {
+
+    bossHPText.textContent =
       boss.health + " / " + boss.maxHealth;
+
   } else {
-    bossHealthText.textContent = "--";
+
+    bossHPText.textContent = "--";
+
   }
 
 }
 
 
+/* LOSE LIFE */
+
+function loseLife() {
+
+  lives--;
+
+  updateUI();
+
+  if (lives <= 0) {
+
+    gameOver = true;
+
+    gameMode = "gameover";
+
+  }
+
+}
+
+
+/* UPDATE */
+
 function update() {
 
-  if (gameOver) return;
+  if (gameMode !== "playing") {
+    return;
+  }
 
 
-  // PLAYER MOVEMENT
+  /* PLAYER */
 
   if (keys["arrowleft"] || keys["a"]) {
     player.x -= player.speed;
@@ -243,91 +462,83 @@ function update() {
     player.x += player.speed;
   }
 
-  if (player.x < 10) {
-    player.x = 10;
+
+  if (player.x < 5) {
+    player.x = 5;
   }
 
-  if (player.x > canvas.width - player.width - 10) {
-    player.x = canvas.width - player.width - 10;
+  if (player.x > canvas.width - player.width - 5) {
+    player.x =
+      canvas.width - player.width - 5;
   }
 
 
-  // PLAYER BULLETS
+  /* PLAYER BULLETS */
 
   for (let i = bullets.length - 1; i >= 0; i--) {
 
     bullets[i].y -= bullets[i].speed;
 
-    if (bullets[i].y < -20) {
+    if (bullets[i].y < -30) {
+
       bullets.splice(i, 1);
+
     }
 
   }
 
 
-  // BOSS FIGHT
+  /* BOSS */
 
-  if (bossFight) {
+  if (boss) {
 
     updateBoss();
 
-    return;
   }
 
 
-  // LITTLE ENEMY BULLETS
+  /* ENEMY MOVEMENT */
 
-  if (Math.random() < 0.025) {
+  if (!boss) {
 
-    const aliveEnemies =
-      enemies.filter(enemy => enemy.alive);
+    enemyMove++;
 
-    if (aliveEnemies.length > 0) {
+    if (enemyMove > 18) {
 
-      const enemy =
-        aliveEnemies[
-          Math.floor(Math.random() * aliveEnemies.length)
-        ];
+      enemyMove = 0;
 
-      enemyBullets.push({
-        x: enemy.x + enemy.width / 2 - 3,
-        y: enemy.y + enemy.height,
-        width: 6,
-        height: 14,
-        speed: 4
-      });
+      let edge = false;
 
-    }
+      for (const enemy of enemies) {
 
-  }
+        if (!enemy.alive) continue;
 
+        enemy.x += enemyDirection * 3;
 
-  // ENEMY BULLETS
+        if (
+          enemy.x < 10 ||
+          enemy.x + enemy.width > 790
+        ) {
 
-  updateEnemyBullets();
+          edge = true;
+
+        }
+
+      }
 
 
-  // BULLETS HIT LITTLE ENEMIES
+      if (edge) {
 
-  for (let i = bullets.length - 1; i >= 0; i--) {
+        enemyDirection *= -1;
 
-    const bullet = bullets[i];
+        for (const enemy of enemies) {
 
-    for (let j = 0; j < enemies.length; j++) {
+          if (enemy.alive) {
+            enemy.y += 12;
+          }
 
-      const enemy = enemies[j];
+        }
 
-      if (enemy.alive && collision(bullet, enemy)) {
-
-        enemy.alive = false;
-
-        bullets.splice(i, 1);
-
-        score += 10;
-
-        updateInfo();
-
-        break;
       }
 
     }
@@ -335,12 +546,146 @@ function update() {
   }
 
 
-  // ALL LITTLE ENEMIES DEFEATED
+  /* ENEMY SHOOTING */
 
-  const remaining =
-    enemies.filter(enemy => enemy.alive).length;
+  enemyShootTimer++;
 
-  if (remaining === 0) {
+  if (enemyShootTimer > 40) {
+
+    enemyShootTimer = 0;
+
+    let aliveEnemies =
+      enemies.filter(enemy => enemy.alive);
+
+    if (aliveEnemies.length > 0) {
+
+      let enemy =
+        aliveEnemies[
+          Math.floor(
+            Math.random() *
+            aliveEnemies.length
+          )
+        ];
+
+
+      enemyBullets.push({
+
+        x: enemy.x + enemy.width / 2,
+
+        y: enemy.y + enemy.height,
+
+        width: 7,
+
+        height: 14,
+
+        speed: stage === 2 ? 5 : 4
+
+      });
+
+    }
+
+  }
+
+
+  /* ENEMY BULLETS */
+
+  for (
+    let i = enemyBullets.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    let bullet = enemyBullets[i];
+
+    bullet.y += bullet.speed;
+
+
+    if (collision(bullet, player)) {
+
+      enemyBullets.splice(i, 1);
+
+      loseLife();
+
+      continue;
+
+    }
+
+
+    if (bullet.y > 520) {
+
+      enemyBullets.splice(i, 1);
+
+    }
+
+  }
+
+
+  /* PLAYER BULLETS */
+
+  for (
+    let i = bullets.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    let bullet = bullets[i];
+
+
+    /* BOSS HIT */
+
+    if (boss && collision(bullet, boss)) {
+
+      boss.health -= bullet.damage;
+
+      score += 5;
+
+      bullets.splice(i, 1);
+
+      updateUI();
+
+
+      if (boss.health <= 0) {
+
+        defeatBoss();
+
+      }
+
+      continue;
+
+    }
+
+
+    /* LITTLE ENEMY HIT */
+
+    for (const enemy of enemies) {
+
+      if (
+        enemy.alive &&
+        collision(bullet, enemy)
+      ) {
+
+        enemy.alive = false;
+
+        score += 10;
+
+        bullets.splice(i, 1);
+
+        break;
+
+      }
+
+    }
+
+  }
+
+
+  /* CHECK IF ALL ENEMIES ARE DEAD */
+
+  if (
+    !boss &&
+    enemies.length > 0 &&
+    enemies.every(enemy => !enemy.alive)
+  ) {
 
     createBoss();
 
@@ -349,110 +694,133 @@ function update() {
 }
 
 
-function updateEnemyBullets() {
+/* CREATE BOSS */
 
-  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+function createBoss() {
 
-    const bullet = enemyBullets[i];
+  if (stage === 1) {
 
-    bullet.y += bullet.speed;
+    boss = {
 
-    if (collision(bullet, player)) {
+      x: 290,
 
-      enemyBullets.splice(i, 1);
+      y: 50,
 
-      lives--;
+      width: 220,
 
-      updateInfo();
+      height: 90,
 
-      if (lives <= 0) {
-        gameOver = true;
-      }
+      health: 30,
 
-      continue;
-    }
+      maxHealth: 30,
 
-    if (bullet.y > canvas.height) {
-      enemyBullets.splice(i, 1);
-    }
+      speed: 3,
+
+      direction: 1,
+
+      timer: 0
+
+    };
+
+  } else {
+
+    boss = {
+
+      x: 260,
+
+      y: 45,
+
+      width: 280,
+
+      height: 105,
+
+      health: 55,
+
+      maxHealth: 55,
+
+      speed: 4,
+
+      direction: 1,
+
+      timer: 0
+
+    };
 
   }
 
+  bullets = [];
+
+  enemyBullets = [];
+
+  updateUI();
+
 }
 
+
+/* BOSS UPDATE */
 
 function updateBoss() {
 
-  // Boss movement
-
-  boss.x += boss.speed * boss.direction;
-
-  if (boss.x <= 20) {
-    boss.direction = 1;
-  }
-
-  if (boss.x + boss.width >= canvas.width - 20) {
-    boss.direction = -1;
-  }
+  boss.x +=
+    boss.speed *
+    boss.direction;
 
 
-  // Boss shooting
+  if (
+    boss.x < 10 ||
+    boss.x + boss.width > 790
+  ) {
 
-  boss.shootTimer++;
-
-  if (boss.shootTimer > 35) {
-
-    boss.shootTimer = 0;
-
-    enemyBullets.push({
-      x: boss.x + 35,
-      y: boss.y + boss.height,
-      width: 9,
-      height: 18,
-      speed: 5
-    });
-
-    enemyBullets.push({
-      x: boss.x + boss.width - 44,
-      y: boss.y + boss.height,
-      width: 9,
-      height: 18,
-      speed: 5
-    });
+    boss.direction *= -1;
 
   }
 
 
-  updateEnemyBullets();
+  boss.timer++;
 
 
-  // PLAYER BULLETS HIT BOSS
-
-  for (let i = bullets.length - 1; i >= 0; i--) {
-
-    const bullet = bullets[i];
-
-    if (collision(bullet, boss)) {
-
-      bullets.splice(i, 1);
-
-      boss.health--;
-
-      score += 5;
-
-      updateInfo();
+  let attackSpeed =
+    stage === 1 ? 40 : 25;
 
 
-      if (boss.health <= 0) {
+  if (boss.timer > attackSpeed) {
 
-        score += 500;
+    boss.timer = 0;
 
-        bossFight = false;
-        gameOver = true;
 
-        updateInfo();
+    let numberOfShots =
+      stage === 1 ? 2 : 3;
 
-      }
+
+    for (
+      let i = 0;
+      i < numberOfShots;
+      i++
+    ) {
+
+      let shotX =
+        boss.x +
+        35 +
+        i *
+        (
+          (boss.width - 70) /
+          (numberOfShots - 1)
+        );
+
+
+      enemyBullets.push({
+
+        x: shotX,
+
+        y: boss.y + boss.height,
+
+        width: 9,
+
+        height: 18,
+
+        speed: stage === 2 ? 6 : 5
+
+      });
 
     }
 
@@ -461,11 +829,49 @@ function updateBoss() {
 }
 
 
+/* BOSS DEFEATED */
+
+function defeatBoss() {
+
+  if (stage === 1) {
+
+    score += 500;
+
+    boss = null;
+
+    gameMode = "upgrade";
+
+    stage = 2;
+
+    updateUI();
+
+    upgradeBox.style.display = "flex";
+
+  }
+
+  else {
+
+    score += 1000;
+
+    gameOver = true;
+
+    gameMode = "win";
+
+    updateUI();
+
+  }
+
+}
+
+
+/* DRAW */
+
 function draw() {
 
-  // BACKGROUND
+  /* BACKGROUND */
 
   ctx.fillStyle = "#03050d";
+
   ctx.fillRect(
     0,
     0,
@@ -474,39 +880,49 @@ function draw() {
   );
 
 
-  // STARS
+  /* STARS */
 
   ctx.fillStyle = "white";
 
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 90; i++) {
 
-    const x = (i * 97) % canvas.width;
-    const y = (i * 53) % canvas.height;
+    let x =
+      (i * 97) %
+      canvas.width;
 
-    ctx.fillRect(x, y, 2, 2);
+    let y =
+      (i * 53) %
+      canvas.height;
+
+    ctx.fillRect(
+      x,
+      y,
+      2,
+      2
+    );
 
   }
 
 
-  // PLAYER
+  /* PLAYER */
 
   ctx.fillStyle = "#35e7ff";
 
   ctx.beginPath();
 
   ctx.moveTo(
-    player.x + player.width / 2,
+    player.x + 30,
     player.y - 12
   );
 
   ctx.lineTo(
     player.x,
-    player.y + player.height
+    player.y + 25
   );
 
   ctx.lineTo(
-    player.x + player.width,
-    player.y + player.height
+    player.x + 60,
+    player.y + 25
   );
 
   ctx.closePath();
@@ -524,7 +940,7 @@ function draw() {
   );
 
 
-  // PLAYER BULLETS
+  /* PLAYER BULLETS */
 
   ctx.fillStyle = "#ffe66d";
 
@@ -540,13 +956,18 @@ function draw() {
   }
 
 
-  // LITTLE ENEMIES
+  /* LITTLE ENEMIES */
 
   for (const enemy of enemies) {
 
     if (!enemy.alive) continue;
 
-    ctx.fillStyle = "#ff4d8d";
+
+    ctx.fillStyle =
+      stage === 1
+      ? "#ff4d8d"
+      : "#35ff9b";
+
 
     ctx.fillRect(
       enemy.x,
@@ -555,32 +976,37 @@ function draw() {
       enemy.height
     );
 
+
     ctx.fillStyle = "#111";
 
-    ctx.fillRect(
-      enemy.x + 8,
-      enemy.y + 7,
-      7,
-      7
-    );
 
     ctx.fillRect(
-      enemy.x + 27,
-      enemy.y + 7,
-      7,
-      7
+      enemy.x + 7,
+      enemy.y + 6,
+      6,
+      6
+    );
+
+
+    ctx.fillRect(
+      enemy.x + 23,
+      enemy.y + 6,
+      6,
+      6
     );
 
   }
 
 
-  // BOSS
+  /* BOSS */
 
-  if (bossFight && boss) {
+  if (boss) {
 
-    // Boss body
+    ctx.fillStyle =
+      stage === 1
+      ? "#9b30ff"
+      : "#e639ff";
 
-    ctx.fillStyle = "#9b30ff";
 
     ctx.fillRect(
       boss.x,
@@ -590,87 +1016,74 @@ function draw() {
     );
 
 
-    // Boss wings
+    /* WINGS */
 
     ctx.fillStyle = "#ff304f";
 
-    ctx.beginPath();
 
-    ctx.moveTo(boss.x, boss.y + 25);
-    ctx.lineTo(boss.x - 45, boss.y + 65);
-    ctx.lineTo(boss.x, boss.y + 75);
-
-    ctx.closePath();
-
-    ctx.fill();
+    ctx.fillRect(
+      boss.x - 35,
+      boss.y + 25,
+      35,
+      45
+    );
 
 
-    ctx.beginPath();
-
-    ctx.moveTo(
+    ctx.fillRect(
       boss.x + boss.width,
-      boss.y + 25
+      boss.y + 25,
+      35,
+      45
     );
 
-    ctx.lineTo(
-      boss.x + boss.width + 45,
-      boss.y + 65
-    );
 
-    ctx.lineTo(
-      boss.x + boss.width,
-      boss.y + 75
-    );
+    /* EYES */
 
-    ctx.closePath();
+    ctx.fillStyle = "#ffe600";
 
-    ctx.fill();
-
-
-    // Boss eyes
-
-    ctx.fillStyle = "#ffeb3b";
 
     ctx.fillRect(
       boss.x + 45,
       boss.y + 25,
-      30,
+      35,
       20
     );
+
 
     ctx.fillRect(
-      boss.x + 125,
+      boss.x + boss.width - 80,
       boss.y + 25,
-      30,
+      35,
       20
     );
 
 
-    // Boss health bar
+    /* HEALTH BAR */
 
     ctx.fillStyle = "#333";
 
     ctx.fillRect(
       boss.x,
-      boss.y - 20,
+      boss.y - 18,
       boss.width,
-      12
+      10
     );
+
 
     ctx.fillStyle = "#ff304f";
 
     ctx.fillRect(
       boss.x,
-      boss.y - 20,
+      boss.y - 18,
       boss.width *
       (boss.health / boss.maxHealth),
-      12
+      10
     );
 
   }
 
 
-  // ENEMY BULLETS
+  /* ENEMY BULLETS */
 
   ctx.fillStyle = "#ff9f43";
 
@@ -686,12 +1099,15 @@ function draw() {
   }
 
 
-  // GAME OVER / WIN SCREEN
+  /* END SCREEN */
 
-  if (gameOver) {
+  if (
+    gameMode === "win" ||
+    gameMode === "gameover"
+  ) {
 
     ctx.fillStyle =
-      "rgba(0,0,0,0.72)";
+      "rgba(0,0,0,.75)";
 
     ctx.fillRect(
       0,
@@ -700,46 +1116,44 @@ function draw() {
       canvas.height
     );
 
-    ctx.fillStyle = "white";
-
-    ctx.font = "bold 42px Arial";
 
     ctx.textAlign = "center";
 
+    ctx.fillStyle = "white";
 
-    if (boss && boss.health <= 0) {
+    ctx.font =
+      "bold 40px Arial";
+
+
+    if (gameMode === "win") {
 
       ctx.fillText(
-        "🏆 BOSS DEFEATED!",
-        canvas.width / 2,
+        "🏆 YOU BEAT STAGE 2!",
+        400,
         230
-      );
-
-      ctx.font = "22px Arial";
-
-      ctx.fillText(
-        "Final Score: " + score,
-        canvas.width / 2,
-        275
       );
 
     } else {
 
       ctx.fillText(
         "GAME OVER",
-        canvas.width / 2,
-        240
-      );
-
-      ctx.font = "22px Arial";
-
-      ctx.fillText(
-        "Score: " + score,
-        canvas.width / 2,
-        280
+        400,
+        230
       );
 
     }
+
+
+    ctx.font =
+      "22px Arial";
+
+
+    ctx.fillText(
+      "Score: " + score,
+      400,
+      275
+    );
+
 
     ctx.textAlign = "left";
 
@@ -748,13 +1162,18 @@ function draw() {
 }
 
 
+/* GAME LOOP */
+
 function gameLoop() {
 
   update();
+
   draw();
 
   if (!gameOver) {
+
     requestAnimationFrame(gameLoop);
+
   }
 
 }
