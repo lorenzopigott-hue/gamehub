@@ -58,14 +58,15 @@ button {
 <h1>🚀 Space Blaster</h1>
 
 <p>
-Move with A/D or the arrow keys.
-Shoot with SPACE.
+Move with A/D or arrow keys. Shoot with SPACE.
 </p>
 
 <div id="info">
 Score: <span id="score">0</span>
 &nbsp; | &nbsp;
 Lives: <span id="lives">3</span>
+&nbsp; | &nbsp;
+Boss HP: <span id="bossHealth">--</span>
 </div>
 
 <canvas id="game" width="800" height="500"></canvas>
@@ -79,14 +80,19 @@ const ctx = canvas.getContext("2d");
 
 const scoreText = document.getElementById("score");
 const livesText = document.getElementById("lives");
+const bossHealthText = document.getElementById("bossHealth");
 
 let player;
 let bullets;
 let enemies;
 let enemyBullets;
+
 let score;
 let lives;
 let gameOver;
+
+let boss;
+let bossFight;
 
 const keys = {};
 
@@ -127,6 +133,9 @@ function startGame() {
   lives = 3;
   gameOver = false;
 
+  boss = null;
+  bossFight = false;
+
   createEnemies();
 
   updateInfo();
@@ -152,6 +161,29 @@ function createEnemies() {
     }
 
   }
+
+}
+
+
+function createBoss() {
+
+  bossFight = true;
+
+  boss = {
+    x: 300,
+    y: 55,
+    width: 200,
+    height: 90,
+    health: 30,
+    maxHealth: 30,
+    speed: 3,
+    direction: 1,
+    shootTimer: 0
+  };
+
+  bullets = [];
+
+  updateInfo();
 
 }
 
@@ -186,6 +218,13 @@ function updateInfo() {
   scoreText.textContent = score;
   livesText.textContent = lives;
 
+  if (bossFight && boss) {
+    bossHealthText.textContent =
+      boss.health + " / " + boss.maxHealth;
+  } else {
+    bossHealthText.textContent = "--";
+  }
+
 }
 
 
@@ -194,7 +233,7 @@ function update() {
   if (gameOver) return;
 
 
-  // Player movement
+  // PLAYER MOVEMENT
 
   if (keys["arrowleft"] || keys["a"]) {
     player.x -= player.speed;
@@ -203,9 +242,6 @@ function update() {
   if (keys["arrowright"] || keys["d"]) {
     player.x += player.speed;
   }
-
-
-  // Keep player inside screen
 
   if (player.x < 10) {
     player.x = 10;
@@ -216,7 +252,7 @@ function update() {
   }
 
 
-  // Move bullets
+  // PLAYER BULLETS
 
   for (let i = bullets.length - 1; i >= 0; i--) {
 
@@ -229,16 +265,29 @@ function update() {
   }
 
 
-  // Enemy shooting
+  // BOSS FIGHT
+
+  if (bossFight) {
+
+    updateBoss();
+
+    return;
+  }
+
+
+  // LITTLE ENEMY BULLETS
 
   if (Math.random() < 0.025) {
 
-    const aliveEnemies = enemies.filter(enemy => enemy.alive);
+    const aliveEnemies =
+      enemies.filter(enemy => enemy.alive);
 
     if (aliveEnemies.length > 0) {
 
       const enemy =
-        aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+        aliveEnemies[
+          Math.floor(Math.random() * aliveEnemies.length)
+        ];
 
       enemyBullets.push({
         x: enemy.x + enemy.width / 2 - 3,
@@ -253,39 +302,12 @@ function update() {
   }
 
 
-  // Enemy bullets
+  // ENEMY BULLETS
 
-  for (let i = enemyBullets.length - 1; i >= 0; i--) {
-
-    const bullet = enemyBullets[i];
-
-    bullet.y += bullet.speed;
+  updateEnemyBullets();
 
 
-    if (collision(bullet, player)) {
-
-      enemyBullets.splice(i, 1);
-
-      lives--;
-
-      updateInfo();
-
-      if (lives <= 0) {
-        gameOver = true;
-      }
-
-      continue;
-    }
-
-
-    if (bullet.y > canvas.height) {
-      enemyBullets.splice(i, 1);
-    }
-
-  }
-
-
-  // Bullet vs enemy
+  // BULLETS HIT LITTLE ENEMIES
 
   for (let i = bullets.length - 1; i >= 0; i--) {
 
@@ -313,13 +335,127 @@ function update() {
   }
 
 
-  // Win
+  // ALL LITTLE ENEMIES DEFEATED
 
   const remaining =
     enemies.filter(enemy => enemy.alive).length;
 
   if (remaining === 0) {
-    gameOver = true;
+
+    createBoss();
+
+  }
+
+}
+
+
+function updateEnemyBullets() {
+
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+
+    const bullet = enemyBullets[i];
+
+    bullet.y += bullet.speed;
+
+    if (collision(bullet, player)) {
+
+      enemyBullets.splice(i, 1);
+
+      lives--;
+
+      updateInfo();
+
+      if (lives <= 0) {
+        gameOver = true;
+      }
+
+      continue;
+    }
+
+    if (bullet.y > canvas.height) {
+      enemyBullets.splice(i, 1);
+    }
+
+  }
+
+}
+
+
+function updateBoss() {
+
+  // Boss movement
+
+  boss.x += boss.speed * boss.direction;
+
+  if (boss.x <= 20) {
+    boss.direction = 1;
+  }
+
+  if (boss.x + boss.width >= canvas.width - 20) {
+    boss.direction = -1;
+  }
+
+
+  // Boss shooting
+
+  boss.shootTimer++;
+
+  if (boss.shootTimer > 35) {
+
+    boss.shootTimer = 0;
+
+    enemyBullets.push({
+      x: boss.x + 35,
+      y: boss.y + boss.height,
+      width: 9,
+      height: 18,
+      speed: 5
+    });
+
+    enemyBullets.push({
+      x: boss.x + boss.width - 44,
+      y: boss.y + boss.height,
+      width: 9,
+      height: 18,
+      speed: 5
+    });
+
+  }
+
+
+  updateEnemyBullets();
+
+
+  // PLAYER BULLETS HIT BOSS
+
+  for (let i = bullets.length - 1; i >= 0; i--) {
+
+    const bullet = bullets[i];
+
+    if (collision(bullet, boss)) {
+
+      bullets.splice(i, 1);
+
+      boss.health--;
+
+      score += 5;
+
+      updateInfo();
+
+
+      if (boss.health <= 0) {
+
+        score += 500;
+
+        bossFight = false;
+        gameOver = true;
+
+        updateInfo();
+
+      }
+
+    }
+
   }
 
 }
@@ -327,13 +463,18 @@ function update() {
 
 function draw() {
 
-  // Background
+  // BACKGROUND
 
   ctx.fillStyle = "#03050d";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
 
 
-  // Stars
+  // STARS
 
   ctx.fillStyle = "white";
 
@@ -347,7 +488,7 @@ function draw() {
   }
 
 
-  // Player spaceship
+  // PLAYER
 
   ctx.fillStyle = "#35e7ff";
 
@@ -373,8 +514,6 @@ function draw() {
   ctx.fill();
 
 
-  // Player window
-
   ctx.fillStyle = "white";
 
   ctx.fillRect(
@@ -385,7 +524,7 @@ function draw() {
   );
 
 
-  // Player bullets
+  // PLAYER BULLETS
 
   ctx.fillStyle = "#ffe66d";
 
@@ -401,7 +540,7 @@ function draw() {
   }
 
 
-  // Enemies
+  // LITTLE ENEMIES
 
   for (const enemy of enemies) {
 
@@ -435,7 +574,103 @@ function draw() {
   }
 
 
-  // Enemy bullets
+  // BOSS
+
+  if (bossFight && boss) {
+
+    // Boss body
+
+    ctx.fillStyle = "#9b30ff";
+
+    ctx.fillRect(
+      boss.x,
+      boss.y,
+      boss.width,
+      boss.height
+    );
+
+
+    // Boss wings
+
+    ctx.fillStyle = "#ff304f";
+
+    ctx.beginPath();
+
+    ctx.moveTo(boss.x, boss.y + 25);
+    ctx.lineTo(boss.x - 45, boss.y + 65);
+    ctx.lineTo(boss.x, boss.y + 75);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      boss.x + boss.width,
+      boss.y + 25
+    );
+
+    ctx.lineTo(
+      boss.x + boss.width + 45,
+      boss.y + 65
+    );
+
+    ctx.lineTo(
+      boss.x + boss.width,
+      boss.y + 75
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    // Boss eyes
+
+    ctx.fillStyle = "#ffeb3b";
+
+    ctx.fillRect(
+      boss.x + 45,
+      boss.y + 25,
+      30,
+      20
+    );
+
+    ctx.fillRect(
+      boss.x + 125,
+      boss.y + 25,
+      30,
+      20
+    );
+
+
+    // Boss health bar
+
+    ctx.fillStyle = "#333";
+
+    ctx.fillRect(
+      boss.x,
+      boss.y - 20,
+      boss.width,
+      12
+    );
+
+    ctx.fillStyle = "#ff304f";
+
+    ctx.fillRect(
+      boss.x,
+      boss.y - 20,
+      boss.width *
+      (boss.health / boss.maxHealth),
+      12
+    );
+
+  }
+
+
+  // ENEMY BULLETS
 
   ctx.fillStyle = "#ff9f43";
 
@@ -451,11 +686,13 @@ function draw() {
   }
 
 
-  // Game over screen
+  // GAME OVER / WIN SCREEN
 
   if (gameOver) {
 
-    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.fillStyle =
+      "rgba(0,0,0,0.72)";
+
     ctx.fillRect(
       0,
       0,
@@ -464,15 +701,26 @@ function draw() {
     );
 
     ctx.fillStyle = "white";
+
     ctx.font = "bold 42px Arial";
+
     ctx.textAlign = "center";
 
-    if (enemies.every(enemy => !enemy.alive)) {
+
+    if (boss && boss.health <= 0) {
 
       ctx.fillText(
-        "YOU WIN!",
+        "🏆 BOSS DEFEATED!",
         canvas.width / 2,
-        240
+        230
+      );
+
+      ctx.font = "22px Arial";
+
+      ctx.fillText(
+        "Final Score: " + score,
+        canvas.width / 2,
+        275
       );
 
     } else {
@@ -483,15 +731,15 @@ function draw() {
         240
       );
 
+      ctx.font = "22px Arial";
+
+      ctx.fillText(
+        "Score: " + score,
+        canvas.width / 2,
+        280
+      );
+
     }
-
-    ctx.font = "20px Arial";
-
-    ctx.fillText(
-      "Click Restart Game to play again",
-      canvas.width / 2,
-      285
-    );
 
     ctx.textAlign = "left";
 
