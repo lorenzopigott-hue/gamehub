@@ -3,462 +3,816 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dungeon Dash</title>
+<title>Dungeon Dash - Deep Dungeon Update</title>
 
 <style>
-* {
-  box-sizing: border-box;
+
+*{
+    box-sizing:border-box;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #090b12;
-  color: #f5f5f5;
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    color:#eee;
+    background:
+        radial-gradient(circle at 50% 20%,#25213a,#0b0c12 70%);
 }
 
-header {
-  background: linear-gradient(135deg, #171b2d, #292044);
-  padding: 18px;
-  text-align: center;
-  border-bottom: 3px solid #6c4cff;
+/* =========================
+   HEADER
+========================= */
+
+header{
+    padding:18px;
+    text-align:center;
+    background:
+        linear-gradient(#29253e,#12131c);
+    border-bottom:3px solid #8066ff;
+    box-shadow:0 4px 25px #000;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 36px;
+header h1{
+    margin:0;
+    font-size:38px;
+    letter-spacing:2px;
 }
 
-header p {
-  margin: 6px 0 0;
-  color: #bdb7ff;
+header p{
+    margin:6px 0 0;
+    color:#aaa4c9;
 }
 
-#game {
-  max-width: 1200px;
-  margin: auto;
-  padding: 15px;
+/* =========================
+   MAIN
+========================= */
+
+#game{
+    max-width:1250px;
+    margin:auto;
+    padding:15px;
 }
 
-/* HUD */
+/* =========================
+   STATS
+========================= */
 
-.hud {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+.stats{
+    display:grid;
+    grid-template-columns:
+        repeat(6,1fr);
+    gap:8px;
+    margin-bottom:12px;
 }
 
-.stat {
-  background: #151925;
-  border: 1px solid #343a52;
-  border-radius: 10px;
-  padding: 10px;
-  text-align: center;
+.stat{
+    background:#151722;
+    border:1px solid #35394d;
+    border-radius:10px;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 4px 10px #0007;
 }
 
-.stat b {
-  display: block;
-  font-size: 13px;
-  color: #aaaec0;
-  margin-bottom: 4px;
+.stat small{
+    display:block;
+    color:#8f93a9;
+    margin-bottom:5px;
 }
 
-.stat span {
-  font-size: 18px;
-  font-weight: bold;
+.stat strong{
+    font-size:18px;
 }
 
-/* Main layout */
+/* =========================
+   LAYOUT
+========================= */
 
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 12px;
+.layout{
+    display:grid;
+    grid-template-columns:
+        minmax(0,1fr) 285px;
+    gap:12px;
 }
 
-.panel {
-  background: #12151f;
-  border: 1px solid #30364c;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 12px;
+/* =========================
+   PANEL
+========================= */
+
+.panel{
+    background:#11141d;
+    border:1px solid #34384b;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow:0 5px 20px #0008;
 }
 
-.panel h2 {
-  margin-top: 0;
+.panel h2{
+    margin-top:0;
 }
 
-/* Dungeon */
+/* =========================
+   DUNGEON
+========================= */
 
-#dungeon {
-  min-height: 650px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 50% 40%, #272238 0%, #151722 45%, #090b10 100%);
-  border: 3px solid #343a52;
+#dungeon{
+    height:680px;
+    position:relative;
+    overflow:hidden;
+    border:5px solid #393444;
+    border-radius:16px;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #514c46 0%,
+            #302f30 35%,
+            #1b1c20 75%,
+            #0b0c10 100%
+        );
+
+    box-shadow:
+        inset 0 0 100px #000,
+        0 0 30px #000;
 }
 
-.room {
-  position: relative;
-  height: 650px;
-  width: 100%;
+/* stone floor */
+
+#dungeon:before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background-image:
+        linear-gradient(#ffffff08 2px,transparent 2px),
+        linear-gradient(90deg,#ffffff08 2px,transparent 2px);
+
+    background-size:55px 55px;
+
+    opacity:.65;
 }
 
-/* Decorative dungeon floor */
+/* floor cracks */
 
-.room::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(#ffffff05 1px, transparent 1px),
-    linear-gradient(90deg, #ffffff05 1px, transparent 1px);
-  background-size: 50px 50px;
+#dungeon:after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+        radial-gradient(
+            ellipse at 20% 30%,
+            transparent 0 50%,
+            #0003 51% 53%,
+            transparent 54%
+        ),
+        radial-gradient(
+            ellipse at 75% 65%,
+            transparent 0 45%,
+            #0003 46% 48%,
+            transparent 49%
+        );
+
+    pointer-events:none;
 }
 
-/* Player */
+/* =========================
+   WALLS
+========================= */
 
-#player {
-  position: absolute;
-  width: 45px;
-  height: 45px;
-  border-radius: 12px;
-  background: #5c6cff;
-  border: 3px solid #b9c0ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 25px;
-  z-index: 20;
-  box-shadow: 0 0 18px #5c6cff88;
-  transition: left .08s, top .08s;
+.wall{
+    position:absolute;
+    background:
+        linear-gradient(
+            135deg,
+            #65605b,
+            #29282a
+        );
+    border:4px solid #151519;
+    box-shadow:
+        inset 0 0 15px #0008,
+        0 5px 10px #000;
+    z-index:4;
 }
 
-/* Enemies */
-
-.enemy {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: #7c2734;
-  border: 3px solid #e35b6d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 27px;
-  z-index: 10;
-  box-shadow: 0 0 15px #e35b6d55;
+.wall.top{
+    left:0;
+    top:0;
+    width:100%;
+    height:45px;
 }
 
-.enemy.boss {
-  width: 78px;
-  height: 78px;
-  font-size: 45px;
-  background: #3e163e;
-  border-color: #d55cff;
-  box-shadow: 0 0 30px #d55cff88;
+.wall.bottom{
+    left:0;
+    bottom:0;
+    width:100%;
+    height:45px;
 }
 
-/* Enemy health */
-
-.enemy-hp {
-  position: absolute;
-  top: -12px;
-  left: 0;
-  width: 100%;
-  height: 7px;
-  background: #26151a;
-  border-radius: 5px;
-  overflow: hidden;
+.wall.left{
+    left:0;
+    top:0;
+    width:45px;
+    height:100%;
 }
 
-.enemy-hp-bar {
-  height: 100%;
-  background: #ff4d5e;
-  width: 100%;
+.wall.right{
+    right:0;
+    top:0;
+    width:45px;
+    height:100%;
 }
 
-/* Items */
+/* =========================
+   PILLARS
+========================= */
 
-.item {
-  position: absolute;
-  font-size: 30px;
-  z-index: 8;
-  animation: float 1.2s infinite alternate;
+.pillar{
+    position:absolute;
+    width:65px;
+    height:65px;
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #242428,
+            #66605b,
+            #29292c
+        );
+
+    border:5px solid #17171a;
+
+    box-shadow:
+        0 8px 15px #000,
+        inset 0 0 12px #aaa3;
+    
+    z-index:5;
 }
 
-@keyframes float {
-  from { transform: translateY(0); }
-  to { transform: translateY(-6px); }
+/* =========================
+   TORCHES
+========================= */
+
+.torch{
+    position:absolute;
+    z-index:6;
+    font-size:30px;
+
+    filter:
+        drop-shadow(0 0 12px #ff9d38)
+        drop-shadow(0 0 25px #ff6a00);
+    
+    animation:
+        flicker .45s infinite alternate;
 }
 
-/* Chest */
-
-.chest {
-  position: absolute;
-  font-size: 38px;
-  z-index: 8;
-  cursor: pointer;
+@keyframes flicker{
+    from{
+        transform:scale(1);
+    }
+    to{
+        transform:scale(1.12);
+    }
 }
 
-/* Trap */
+/* =========================
+   PLAYER
+========================= */
 
-.trap {
-  position: absolute;
-  width: 55px;
-  height: 55px;
-  background: #34343c;
-  border: 3px solid #777;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 25px;
+#player{
+    position:absolute;
+
+    width:58px;
+    height:78px;
+
+    z-index:30;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:50px;
+
+    background:
+        radial-gradient(
+            circle,
+            #6975ff44,
+            transparent 70%
+        );
+
+    border-radius:15px;
+
+    transition:
+        left .08s,
+        top .08s;
+
+    filter:
+        drop-shadow(0 0 10px #6370ff);
 }
 
-/* Exit */
+/* If player PNG exists */
 
-.exit {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  width: 70px;
-  height: 70px;
-  border: 3px solid #65e6ff;
-  border-radius: 50%;
-  background: #173642;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 35px;
-  box-shadow: 0 0 25px #65e6ff77;
+#player img{
+    width:58px;
+    height:78px;
+    object-fit:contain;
 }
 
-/* Controls */
+/* =========================
+   ENEMIES
+========================= */
 
-.controls {
-  display: grid;
-  grid-template-columns: repeat(3, 70px);
-  justify-content: center;
-  gap: 6px;
+.enemy{
+    position:absolute;
+
+    width:60px;
+    height:68px;
+
+    z-index:25;
+
+    border-radius:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:43px;
+
+    background:
+        radial-gradient(
+            circle,
+            #5c2935,
+            #21151c
+        );
+
+    border:3px solid #a8495b;
+
+    box-shadow:
+        0 0 15px #8c304b88,
+        0 8px 15px #000;
+
+    transition:
+        left .15s,
+        top .15s;
 }
 
-.controls button {
-  height: 55px;
-  font-size: 22px;
+/* goblin face detail */
+
+.goblin{
+    position:absolute;
+    width:62px;
+    height:70px;
+    z-index:25;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            #8bbf52 0 22%,
+            #456b35 23% 60%,
+            #17251a 61%
+        );
+
+    border-radius:
+        45% 45% 35% 35%;
+
+    border:3px solid #283f25;
+
+    box-shadow:
+        0 8px 12px #000,
+        inset 0 0 10px #0008;
 }
 
-.controls button:nth-child(1) {
-  grid-column: 2;
+.goblin:before{
+    content:"👁️  👁️";
+    position:absolute;
+    top:20px;
+    left:3px;
+    font-size:16px;
 }
 
-.controls button:nth-child(2) {
-  grid-column: 1;
-  grid-row: 2;
+.goblin:after{
+    content:"";
+    position:absolute;
+    bottom:10px;
+    left:17px;
+    width:25px;
+    height:8px;
+    border-bottom:3px solid #182018;
 }
 
-.controls button:nth-child(3) {
-  grid-column: 2;
-  grid-row: 2;
+/* enemy HP */
+
+.enemyHP{
+    position:absolute;
+    left:0;
+    top:-12px;
+    width:100%;
+    height:7px;
+    background:#180b0e;
+    border-radius:10px;
+    overflow:hidden;
 }
 
-.controls button:nth-child(4) {
-  grid-column: 3;
-  grid-row: 2;
+.enemyHPbar{
+    height:100%;
+    background:#e84b5c;
 }
 
-.controls button:nth-child(5) {
-  grid-column: 2;
-  grid-row: 3;
+/* =========================
+   TREASURE
+========================= */
+
+.chest{
+    position:absolute;
+    z-index:20;
+
+    font-size:42px;
+
+    cursor:pointer;
+
+    filter:
+        drop-shadow(0 0 12px #ffb300);
+
+    animation:
+        treasureFloat 1.1s infinite alternate;
 }
 
-button {
-  border: 0;
-  border-radius: 9px;
-  padding: 10px 13px;
-  background: #5146c9;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+@keyframes treasureFloat{
+    from{
+        transform:translateY(0);
+    }
+    to{
+        transform:translateY(-5px);
+    }
 }
 
-button:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
+/* =========================
+   EXIT
+========================= */
+
+.exit{
+    position:absolute;
+
+    right:65px;
+    top:280px;
+
+    width:80px;
+    height:110px;
+
+    z-index:15;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:50px;
+
+    background:
+        linear-gradient(
+            #27202e,
+            #0b0a0e
+        );
+
+    border:
+        5px solid #65536e;
+
+    border-radius:
+        8px 8px 3px 3px;
+
+    box-shadow:
+        0 0 20px #b76cff66;
 }
 
-button:active {
-  transform: translateY(1px);
+/* =========================
+   TRAPS
+========================= */
+
+.trap{
+    position:absolute;
+
+    width:65px;
+    height:65px;
+
+    z-index:10;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #222 0 35%,
+            #555 36% 40%,
+            #171717 41%
+        );
+
+    border:3px solid #777;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
 }
 
-.attack {
-  background: #c83c4e;
-  width: 100%;
-  margin-top: 8px;
-  font-size: 18px;
+/* =========================
+   BARS
+========================= */
+
+.bar{
+    width:100%;
+    height:14px;
+
+    background:#282b35;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    margin:6px 0 12px;
 }
 
-.spell {
-  background: #5b3ec2;
-  width: 100%;
-  margin-top: 8px;
+.bar div{
+    height:100%;
+    transition:width .2s;
 }
 
-.potion {
-  background: #23865b;
-  width: 100%;
-  margin-top: 8px;
+.health{
+    background:#e34b55;
 }
 
-/* Bars */
-
-.bar {
-  height: 14px;
-  background: #272b38;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 6px 0 12px;
+.mana{
+    background:#497fff;
 }
 
-.bar div {
-  height: 100%;
-  transition: width .2s;
+.xp{
+    background:#a259ff;
 }
 
-.hp {
-  background: #e5484d;
+/* =========================
+   BUTTONS
+========================= */
+
+button{
+    border:0;
+    border-radius:9px;
+
+    padding:11px;
+
+    background:#5547ce;
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.12s;
 }
 
-.mana {
-  background: #4c8dff;
+button:hover{
+    filter:brightness(1.15);
+    transform:translateY(-1px);
 }
 
-.xp {
-  background: #a64cff;
+.attack{
+    width:100%;
+    margin-top:8px;
+    background:#c44350;
+    font-size:17px;
 }
 
-/* Minimap */
-
-#map {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 3px;
+.magic{
+    width:100%;
+    margin-top:8px;
+    background:#663fd1;
 }
 
-.map-cell {
-  aspect-ratio: 1;
-  background: #252936;
-  border-radius: 3px;
+.potion{
+    width:100%;
+    margin-top:8px;
+    background:#238858;
 }
 
-.map-cell.visited {
-  background: #454c66;
+/* =========================
+   MOVEMENT
+========================= */
+
+.controls{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,65px);
+
+    gap:6px;
+
+    justify-content:center;
 }
 
-.map-cell.current {
-  background: #6c5cff;
+.controls button{
+    height:55px;
+    font-size:21px;
 }
 
-.map-cell.boss {
-  background: #922c91;
+.controls button:nth-child(1){
+    grid-column:2;
 }
 
-/* Log */
-
-#log {
-  height: 150px;
-  overflow-y: auto;
-  background: #080a0f;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 13px;
+.controls button:nth-child(2){
+    grid-column:1;
+    grid-row:2;
 }
 
-.log-line {
-  margin-bottom: 6px;
-  color: #c4c7d4;
+.controls button:nth-child(3){
+    grid-column:2;
+    grid-row:2;
 }
 
-/* Inventory */
-
-.inventory {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+.controls button:nth-child(4){
+    grid-column:3;
+    grid-row:2;
 }
 
-.inventory-item {
-  background: #202431;
-  padding: 10px;
-  text-align: center;
-  border-radius: 7px;
+.controls button:nth-child(5){
+    grid-column:2;
+    grid-row:3;
 }
 
-/* Overlay */
+/* =========================
+   MAP
+========================= */
 
-#overlay {
-  position: fixed;
-  inset: 0;
-  background: #05060beF;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 20px;
+#map{
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:4px;
 }
 
-#overlayBox {
-  background: #151925;
-  border: 2px solid #6c4cff;
-  border-radius: 18px;
-  padding: 30px;
-  text-align: center;
-  max-width: 500px;
-  width: 100%;
+.mapCell{
+    aspect-ratio:1;
+
+    border-radius:4px;
+
+    background:#272a35;
 }
 
-#overlayBox h2 {
-  font-size: 35px;
+.mapCell.visited{
+    background:#4b4f62;
 }
 
-/* Responsive */
-
-@media (max-width: 850px) {
-
-  .hud {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  #dungeon {
-    min-height: 550px;
-  }
-
-  .room {
-    height: 550px;
-  }
+.mapCell.current{
+    background:#6958e9;
+    box-shadow:0 0 8px #806eff;
 }
 
-@media (max-width: 550px) {
+.mapCell.boss{
+    background:#a33b9e;
+}
 
-  header h1 {
-    font-size: 28px;
-  }
+/* =========================
+   LOG
+========================= */
 
-  .hud {
-    grid-template-columns: repeat(2, 1fr);
-  }
+#log{
+    height:180px;
 
-  .inventory {
-    grid-template-columns: repeat(2, 1fr);
-  }
+    overflow-y:auto;
+
+    background:#090b10;
+
+    border-radius:8px;
+
+    padding:10px;
+
+    font-size:13px;
+}
+
+.logLine{
+    margin-bottom:7px;
+    color:#c8cbd6;
+}
+
+/* =========================
+   INVENTORY
+========================= */
+
+.inventory{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:7px;
+}
+
+.itemBox{
+    padding:10px;
+
+    text-align:center;
+
+    background:#202430;
+
+    border-radius:8px;
+}
+
+/* =========================
+   BOSS ROOM
+========================= */
+
+.bossRoom{
+    background:
+        radial-gradient(
+            circle at center,
+            #44203f,
+            #171321 45%,
+            #08080d 100%
+        ) !important;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+#message{
+    min-height:25px;
+    color:#c8c2ff;
+    font-weight:bold;
+}
+
+/* =========================
+   OVERLAY
+========================= */
+
+#overlay{
+    position:fixed;
+    inset:0;
+
+    background:#030409eF;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    z-index:100;
+}
+
+#overlayBox{
+    width:90%;
+    max-width:500px;
+
+    padding:35px;
+
+    text-align:center;
+
+    border-radius:18px;
+
+    background:#151824;
+
+    border:2px solid #8066ff;
+
+    box-shadow:0 0 50px #000;
+}
+
+#overlayBox h2{
+    font-size:35px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:850px){
+
+    .stats{
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .layout{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:550px){
+
+    header h1{
+        font-size:28px;
+    }
+
+    .stats{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    #dungeon{
+        height:550px;
+    }
+
 }
 
 </style>
@@ -467,1698 +821,1939 @@ button:active {
 <body>
 
 <header>
-  <h1>⚔️ Dungeon Dash</h1>
-  <p>Explore the dungeon. Defeat monsters. Find the treasure.</p>
+
+<h1>⚔️ DUNGEON DASH</h1>
+
+<p>
+THE DEEP DUNGEON UPDATE
+</p>
+
 </header>
+
 
 <div id="game">
 
-  <!-- HUD -->
+<!-- =========================
+     STATS
+========================= -->
 
-  <div class="hud">
+<div class="stats">
 
-    <div class="stat">
-      <b>❤️ HEALTH</b>
-      <span id="healthText">100 / 100</span>
-    </div>
+<div class="stat">
+<small>❤️ HEALTH</small>
+<strong id="healthText">
+100 / 100
+</strong>
+</div>
 
-    <div class="stat">
-      <b>🔵 MANA</b>
-      <span id="manaText">50 / 50</span>
-    </div>
+<div class="stat">
+<small>🔵 MANA</small>
+<strong id="manaText">
+60 / 60
+</strong>
+</div>
 
-    <div class="stat">
-      <b>⭐ LEVEL</b>
-      <span id="levelText">1</span>
-    </div>
+<div class="stat">
+<small>⭐ LEVEL</small>
+<strong id="levelText">
+1
+</strong>
+</div>
 
-    <div class="stat">
-      <b>✨ XP</b>
-      <span id="xpText">0 / 100</span>
-    </div>
+<div class="stat">
+<small>✨ XP</small>
+<strong id="xpText">
+0 / 100
+</strong>
+</div>
 
-    <div class="stat">
-      <b>🪙 GOLD</b>
-      <span id="goldText">0</span>
-    </div>
+<div class="stat">
+<small>🪙 GOLD</small>
+<strong id="goldText">
+0
+</strong>
+</div>
 
-    <div class="stat">
-      <b>🚪 ROOM</b>
-      <span id="roomText">1</span>
-    </div>
-
-  </div>
-
-  <div class="layout">
-
-    <div>
-
-      <div class="panel">
-        <div id="dungeon">
-          <div class="room" id="room"></div>
-        </div>
-      </div>
-
-      <div class="panel">
-
-        <h2>🎮 Controls</h2>
-
-        <p>
-          Use <b>W A S D</b> or the buttons to move.
-        </p>
-
-        <div class="controls">
-
-          <button onclick="move(0,-1)">⬆️</button>
-
-          <button onclick="move(-1,0)">⬅️</button>
-
-          <button onclick="move(0,1)">⬇️</button>
-
-          <button onclick="move(1,0)">➡️</button>
-
-        </div>
-
-        <button class="attack" onclick="attack()">
-          ⚔️ ATTACK
-        </button>
-
-        <button class="spell" onclick="fireball()">
-          🔥 FIREBALL
-        </button>
-
-        <button class="potion" onclick="usePotion()">
-          🧪 USE POTION
-        </button>
-
-      </div>
-
-    </div>
-
-    <aside>
-
-      <div class="panel">
-
-        <h2>❤️ Health</h2>
-
-        <div class="bar">
-          <div id="healthBar" class="hp"></div>
-        </div>
-
-        <h2>🔵 Mana</h2>
-
-        <div class="bar">
-          <div id="manaBar" class="mana"></div>
-        </div>
-
-        <h2>✨ Experience</h2>
-
-        <div class="bar">
-          <div id="xpBar" class="xp"></div>
-        </div>
-
-      </div>
-
-      <div class="panel">
-
-        <h2>🗺️ Map</h2>
-
-        <div id="map"></div>
-
-      </div>
-
-      <div class="panel">
-
-        <h2>🎒 Inventory</h2>
-
-        <div class="inventory">
-
-          <div class="inventory-item">
-            🧪<br>
-            Potions<br>
-            <b id="potionText">3</b>
-          </div>
-
-          <div class="inventory-item">
-            🪙<br>
-            Gold<br>
-            <b id="inventoryGold">0</b>
-          </div>
-
-          <div class="inventory-item">
-            ⚔️<br>
-            Weapon<br>
-            <b id="weaponText">Sword</b>
-          </div>
-
-          <div class="inventory-item">
-            🛡️<br>
-            Armor<br>
-            <b id="armorText">Cloth</b>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="panel">
-
-        <h2>📜 Dungeon Log</h2>
-
-        <div id="log"></div>
-
-      </div>
-
-    </aside>
-
-  </div>
+<div class="stat">
+<small>🚪 FLOOR</small>
+<strong id="roomText">
+1 / 10
+</strong>
+</div>
 
 </div>
 
 
-<!-- GAME OVER / WIN SCREEN -->
+<div class="layout">
+
+
+<!-- =========================
+     LEFT
+========================= -->
+
+<div>
+
+<div class="panel">
+
+<div id="dungeon">
+
+<!-- Walls -->
+
+<div class="wall top"></div>
+<div class="wall bottom"></div>
+<div class="wall left"></div>
+<div class="wall right"></div>
+
+<!-- Pillars -->
+
+<div class="pillar" style="left:90px;top:100px;"></div>
+
+<div class="pillar" style="left:90px;bottom:100px;"></div>
+
+<div class="pillar" style="right:180px;top:100px;"></div>
+
+<div class="pillar" style="right:180px;bottom:100px;"></div>
+
+<!-- Torches -->
+
+<div class="torch" style="left:120px;top:45px;">
+🔥
+</div>
+
+<div class="torch" style="left:50%;top:45px;">
+🔥
+</div>
+
+<div class="torch" style="right:120px;top:45px;">
+🔥
+</div>
+
+<!-- Player -->
+
+<div id="player">
+
+<img
+src="assets/ray-garraty.png"
+alt="Player"
+onerror="this.style.display='none';this.parentElement.textContent='🧙';"
+>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     CONTROLS
+========================= -->
+
+<div class="panel">
+
+<h2>🎮 Controls</h2>
+
+<p>
+Move with <b>W A S D</b> or the buttons.
+</p>
+
+<div class="controls">
+
+<button onclick="move(0,-1)">
+⬆️
+</button>
+
+<button onclick="move(-1,0)">
+⬅️
+</button>
+
+<button onclick="move(0,1)">
+⬇️
+</button>
+
+<button onclick="move(1,0)">
+➡️
+</button>
+
+</div>
+
+<button
+class="attack"
+onclick="attack()"
+>
+⚔️ ATTACK
+</button>
+
+<button
+class="magic"
+onclick="fireball()"
+>
+🔥 ARCANE BLAST
+</button>
+
+<button
+class="potion"
+onclick="usePotion()"
+>
+🧪 HEALTH POTION
+</button>
+
+<p id="message"></p>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     RIGHT SIDE
+========================= -->
+
+<div>
+
+<div class="panel">
+
+<h2>❤️ Character</h2>
+
+<p>Health</p>
+
+<div class="bar">
+<div
+id="healthBar"
+class="health"
+style="width:100%"
+></div>
+</div>
+
+<p>Mana</p>
+
+<div class="bar">
+<div
+id="manaBar"
+class="mana"
+style="width:100%"
+></div>
+</div>
+
+<p>Experience</p>
+
+<div class="bar">
+<div
+id="xpBar"
+class="xp"
+style="width:0%"
+></div>
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h2>🗺️ Dungeon Map</h2>
+
+<div id="map"></div>
+
+</div>
+
+
+<div class="panel">
+
+<h2>🎒 Inventory</h2>
+
+<div class="inventory">
+
+<div class="itemBox">
+🧪<br>
+Potions<br>
+<b id="potionText">3</b>
+</div>
+
+<div class="itemBox">
+🪙<br>
+Gold<br>
+<b id="inventoryGold">0</b>
+</div>
+
+<div class="itemBox">
+⚔️<br>
+Weapon<br>
+<b id="weaponText">Starter Blade</b>
+</div>
+
+<div class="itemBox">
+🛡️<br>
+Armor<br>
+<b id="armorText">Traveler</b>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h2>📜 Dungeon Log</h2>
+
+<div id="log"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     END SCREEN
+========================= -->
 
 <div id="overlay">
 
-  <div id="overlayBox">
+<div id="overlayBox">
 
-    <h2 id="overlayTitle">
-      Dungeon Complete!
-    </h2>
+<h2 id="overlayTitle">
+🏆 Victory!
+</h2>
 
-    <p id="overlayText">
-      You defeated the dungeon!
-    </p>
+<p id="overlayText"></p>
 
-    <button onclick="restartGame()">
-      🔄 Play Again
-    </button>
+<button onclick="location.reload()">
+🔄 Play Again
+</button>
 
-  </div>
+</div>
 
 </div>
 
 
 <script>
 
-/* =====================================================
-   DUNGEON DASH
-   ===================================================== */
-
-const room = document.getElementById("room");
+/* ============================================
+   GAME DATA
+============================================ */
 
 let game = {
 
-  room: 1,
+    floor:1,
 
-  maxRooms: 8,
+    maxFloor:10,
 
-  health: 100,
+    health:100,
 
-  maxHealth: 100,
+    maxHealth:100,
 
-  mana: 50,
+    mana:60,
 
-  maxMana: 50,
+    maxMana:60,
 
-  level: 1,
+    level:1,
 
-  xp: 0,
+    xp:0,
 
-  xpNeeded: 100,
+    xpNeeded:100,
 
-  gold: 0,
+    gold:0,
 
-  potions: 3,
+    potions:3,
 
-  weapon: "Sword",
+    weapon:"Starter Blade",
 
-  armor: "Cloth",
+    armor:"Traveler",
 
-  damage: 18,
+    damage:18,
 
-  playerX: 120,
+    playerX:120,
 
-  playerY: 300,
+    playerY:300,
 
-  enemies: [],
+    enemies:[],
 
-  chests: [],
+    visited:[1],
 
-  traps: [],
-
-  items: [],
-
-  visited: [],
-
-  gameOver: false
+    gameOver:false
 
 };
 
 
-/* =====================================================
+/* ============================================
+   DOM
+============================================ */
+
+const dungeon =
+document.getElementById("dungeon");
+
+const player =
+document.getElementById("player");
+
+
+/* ============================================
    LOG
-   ===================================================== */
+============================================ */
 
-function log(text) {
+function log(text){
 
-  const box = document.getElementById("log");
+    const box =
+    document.getElementById("log");
 
-  const line = document.createElement("div");
+    const line =
+    document.createElement("div");
 
-  line.className = "log-line";
+    line.className="logLine";
 
-  line.textContent = "• " + text;
+    line.textContent="• "+text;
 
-  box.prepend(line);
+    box.prepend(line);
 
 }
 
 
-/* =====================================================
-   UPDATE HUD
-   ===================================================== */
+/* ============================================
+   MESSAGE
+============================================ */
 
-function updateHUD() {
+function message(text){
 
-  document.getElementById("healthText").textContent =
+    document.getElementById(
+        "message"
+    ).textContent=text;
+
+}
+
+
+/* ============================================
+   HUD
+============================================ */
+
+function updateHUD(){
+
+    document.getElementById(
+        "healthText"
+    ).textContent=
     `${game.health} / ${game.maxHealth}`;
 
-  document.getElementById("manaText").textContent =
+    document.getElementById(
+        "manaText"
+    ).textContent=
     `${game.mana} / ${game.maxMana}`;
 
-  document.getElementById("levelText").textContent =
+    document.getElementById(
+        "levelText"
+    ).textContent=
     game.level;
 
-  document.getElementById("xpText").textContent =
+    document.getElementById(
+        "xpText"
+    ).textContent=
     `${game.xp} / ${game.xpNeeded}`;
 
-  document.getElementById("goldText").textContent =
+    document.getElementById(
+        "goldText"
+    ).textContent=
     game.gold;
 
-  document.getElementById("inventoryGold").textContent =
+    document.getElementById(
+        "inventoryGold"
+    ).textContent=
     game.gold;
 
-  document.getElementById("potionText").textContent =
+    document.getElementById(
+        "potionText"
+    ).textContent=
     game.potions;
 
-  document.getElementById("weaponText").textContent =
+    document.getElementById(
+        "weaponText"
+    ).textContent=
     game.weapon;
 
-  document.getElementById("armorText").textContent =
+    document.getElementById(
+        "armorText"
+    ).textContent=
     game.armor;
 
-  document.getElementById("roomText").textContent =
-    `${game.room} / ${game.maxRooms}`;
+    document.getElementById(
+        "roomText"
+    ).textContent=
+    `${game.floor} / ${game.maxFloor}`;
 
-  document.getElementById("healthBar").style.width =
-    `${Math.max(0, game.health / game.maxHealth * 100)}%`;
+    document.getElementById(
+        "healthBar"
+    ).style.width=
+    `${Math.max(
+        0,
+        game.health/game.maxHealth*100
+    )}%`;
 
-  document.getElementById("manaBar").style.width =
-    `${game.mana / game.maxMana * 100}%`;
+    document.getElementById(
+        "manaBar"
+    ).style.width=
+    `${game.mana/game.maxMana*100}%`;
 
-  document.getElementById("xpBar").style.width =
-    `${game.xp / game.xpNeeded * 100}%`;
+    document.getElementById(
+        "xpBar"
+    ).style.width=
+    `${game.xp/game.xpNeeded*100}%`;
 
 }
 
 
-/* =====================================================
+/* ============================================
    MAP
-   ===================================================== */
+============================================ */
 
-function renderMap() {
+function renderMap(){
 
-  const map = document.getElementById("map");
+    const map =
+    document.getElementById("map");
 
-  map.innerHTML = "";
+    map.innerHTML="";
 
-  for (let i = 1; i <= 15; i++) {
+    for(
+        let i=1;
+        i<=15;
+        i++
+    ){
 
-    const cell = document.createElement("div");
+        const cell =
+        document.createElement("div");
 
-    cell.className = "map-cell";
+        cell.className="mapCell";
 
-    if (game.visited.includes(i)) {
-      cell.classList.add("visited");
+        if(
+            game.visited.includes(i)
+        ){
+
+            cell.classList.add(
+                "visited"
+            );
+
+        }
+
+        if(
+            i===game.floor
+        ){
+
+            cell.classList.add(
+                "current"
+            );
+
+        }
+
+        if(
+            i===game.maxFloor
+        ){
+
+            cell.classList.add(
+                "boss"
+            );
+
+        }
+
+        map.appendChild(cell);
+
     }
-
-    if (i === game.room) {
-      cell.classList.add("current");
-    }
-
-    if (i === game.maxRooms) {
-      cell.classList.add("boss");
-    }
-
-    map.appendChild(cell);
-
-  }
 
 }
 
 
-/* =====================================================
-   CREATE ROOM
-   ===================================================== */
+/* ============================================
+   PLAYER POSITION
+============================================ */
 
-function createRoom() {
+function updatePlayer(){
 
-  game.enemies = [];
+    player.style.left=
+    game.playerX+"px";
 
-  game.chests = [];
-
-  game.traps = [];
-
-  game.items = [];
-
-  room.innerHTML = "";
-
-  game.playerX = 100;
-
-  game.playerY = 300;
-
-  createPlayer();
-
-  /*
-    Boss room
-  */
-
-  if (game.room === game.maxRooms) {
-
-    createBoss();
-
-    log("⚠️ You have entered the BOSS ROOM!");
-
-    createExit();
-
-    return;
-
-  }
-
-
-  /*
-    Number of enemies increases
-  */
-
-  const enemyCount =
-    Math.min(5, 1 + Math.floor(game.room / 2));
-
-
-  for (let i = 0; i < enemyCount; i++) {
-
-    createEnemy();
-
-  }
-
-
-  /*
-    Chests
-  */
-
-  if (Math.random() < 0.75) {
-
-    createChest();
-
-  }
-
-
-  /*
-    Traps
-  */
-
-  if (Math.random() < 0.65) {
-
-    createTrap();
-
-  }
-
-
-  /*
-    Random loot
-  */
-
-  if (Math.random() < 0.5) {
-
-    createLoot();
-
-  }
-
-
-  createExit();
+    player.style.top=
+    game.playerY+"px";
 
 }
 
 
-/* =====================================================
-   PLAYER
-   ===================================================== */
+/* ============================================
+   MOVEMENT
+============================================ */
 
-function createPlayer() {
+function move(dx,dy){
 
-  const player = document.createElement("div");
+    if(game.gameOver)
+        return;
 
-  player.id = "player";
+    const speed=32;
 
-  player.textContent = "🧙";
+    game.playerX+=dx*speed;
 
-  player.style.left =
-    game.playerX + "px";
+    game.playerY+=dy*speed;
 
-  player.style.top =
-    game.playerY + "px";
-
-  room.appendChild(player);
-
-}
-
-
-/* =====================================================
-   MOVE
-   ===================================================== */
-
-function move(dx, dy) {
-
-  if (game.gameOver) {
-    return;
-  }
-
-  const speed = 35;
-
-  game.playerX += dx * speed;
-
-  game.playerY += dy * speed;
-
-  /*
-    Keep player inside room
-  */
-
-  game.playerX =
+    game.playerX=
     Math.max(
-      10,
-      Math.min(
-        room.clientWidth - 55,
-        game.playerX
-      )
+        50,
+        Math.min(
+            dungeon.clientWidth-110,
+            game.playerX
+        )
     );
 
-  game.playerY =
+    game.playerY=
     Math.max(
-      10,
-      Math.min(
-        room.clientHeight - 55,
-        game.playerY
-      )
+        60,
+        Math.min(
+            dungeon.clientHeight-120,
+            game.playerY
+        )
     );
 
-  const player =
-    document.getElementById("player");
+    updatePlayer();
 
-  player.style.left =
-    game.playerX + "px";
-
-  player.style.top =
-    game.playerY + "px";
-
-  checkCollisions();
+    checkEnemyDistance();
 
 }
 
 
-/* =====================================================
+/* ============================================
    KEYBOARD
-   ===================================================== */
+============================================ */
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener(
+"keydown",
+function(e){
 
-  if (e.key === "w" || e.key === "ArrowUp") {
-    move(0,-1);
-  }
+    if(
+        e.key==="w"||
+        e.key==="ArrowUp"
+    )
+        move(0,-1);
 
-  if (e.key === "s" || e.key === "ArrowDown") {
-    move(0,1);
-  }
+    if(
+        e.key==="s"||
+        e.key==="ArrowDown"
+    )
+        move(0,1);
 
-  if (e.key === "a" || e.key === "ArrowLeft") {
-    move(-1,0);
-  }
+    if(
+        e.key==="a"||
+        e.key==="ArrowLeft"
+    )
+        move(-1,0);
 
-  if (e.key === "d" || e.key === "ArrowRight") {
-    move(1,0);
-  }
+    if(
+        e.key==="d"||
+        e.key==="ArrowRight"
+    )
+        move(1,0);
 
-  if (e.key === " ") {
-    attack();
-  }
+    if(e.key===" ")
+        attack();
 
-  if (e.key === "q") {
-    fireball();
-  }
+    if(
+        e.key==="q"
+    )
+        fireball();
 
-  if (e.key === "e") {
-    usePotion();
-  }
+    if(
+        e.key==="e"
+    )
+        usePotion();
 
 });
 
 
-/* =====================================================
-   ENEMIES
-   ===================================================== */
+/* ============================================
+   ENEMY TYPES
+============================================ */
 
-const enemyTypes = [
+const enemyTypes=[
 
-  {
-    name: "Goblin",
-    emoji: "👺",
-    health: 35,
-    damage: 7,
-    xp: 30,
-    gold: 8
-  },
+    {
+        name:"Cave Goblin",
+        emoji:"👺",
+        hp:45,
+        damage:7,
+        xp:25,
+        gold:10
+    },
 
-  {
-    name: "Skeleton",
-    emoji: "💀",
-    health: 45,
-    damage: 9,
-    xp: 40,
-    gold: 12
-  },
+    {
+        name:"Armored Goblin",
+        emoji:"👹",
+        hp:70,
+        damage:10,
+        xp:40,
+        gold:16
+    },
 
-  {
-    name: "Orc",
-    emoji: "👹",
-    health: 65,
-    damage: 13,
-    xp: 55,
-    gold: 18
-  },
+    {
+        name:"Shadow Goblin",
+        emoji:"👺",
+        hp:85,
+        damage:13,
+        xp:55,
+        gold:24
+    },
 
-  {
-    name: "Dark Mage",
-    emoji: "🧟",
-    health: 55,
-    damage: 16,
-    xp: 70,
-    gold: 25
-  }
+    {
+        name:"Stone Guardian",
+        emoji:"🗿",
+        hp:120,
+        damage:16,
+        xp:75,
+        gold:35
+    }
 
 ];
 
 
-function createEnemy() {
-
-  const type =
-    enemyTypes[
-      Math.floor(
-        Math.random() * enemyTypes.length
-      )
-    ];
-
-  const enemy = {
-
-    name: type.name,
-
-    emoji: type.emoji,
-
-    health: type.health +
-      game.room * 5,
-
-    maxHealth: type.health +
-      game.room * 5,
-
-    damage: type.damage +
-      game.room,
-
-    xp: type.xp,
-
-    gold: type.gold,
-
-    x:
-      250 +
-      Math.random() *
-      Math.max(
-        100,
-        room.clientWidth - 350
-      ),
-
-    y:
-      70 +
-      Math.random() *
-      Math.max(
-        100,
-        room.clientHeight - 150
-      ),
-
-    element: null
-
-  };
-
-
-  const el =
-    document.createElement("div");
-
-  el.className = "enemy";
-
-  el.innerHTML = `
-
-    <div class="enemy-hp">
-      <div class="enemy-hp-bar"></div>
-    </div>
-
-    ${enemy.emoji}
-
-  `;
-
-  el.style.left =
-    enemy.x + "px";
-
-  el.style.top =
-    enemy.y + "px";
-
-  room.appendChild(el);
-
-  enemy.element = el;
-
-  game.enemies.push(enemy);
-
-}
-
-
-/* =====================================================
-   BOSS
-   ===================================================== */
-
-function createBoss() {
-
-  const boss = {
-
-    name: "Dungeon Lord",
-
-    emoji: "👿",
-
-    health: 400,
-
-    maxHealth: 400,
-
-    damage: 25,
-
-    xp: 500,
-
-    gold: 250,
-
-    x: room.clientWidth / 2 - 40,
-
-    y: 230,
-
-    element: null
-
-  };
-
-
-  const el =
-    document.createElement("div");
-
-  el.className = "enemy boss";
-
-  el.innerHTML = `
-
-    <div class="enemy-hp">
-      <div
-        class="enemy-hp-bar"
-        style="width:100%">
-      </div>
-    </div>
-
-    ${boss.emoji}
-
-  `;
-
-  el.style.left =
-    boss.x + "px";
-
-  el.style.top =
-    boss.y + "px";
-
-  room.appendChild(el);
-
-  boss.element = el;
-
-  game.enemies.push(boss);
-
-  log("👿 THE DUNGEON LORD HAS AWAKENED!");
-
-}
-
-
-/* =====================================================
-   ATTACK
-   ===================================================== */
-
-function attack() {
-
-  if (game.gameOver) {
-    return;
-  }
-
-  if (game.enemies.length === 0) {
-
-    log("There are no enemies nearby.");
-
-    return;
-
-  }
-
-
-  let target = null;
-
-  let closest = Infinity;
-
-
-  game.enemies.forEach(enemy => {
-
-    const distance =
-      Math.hypot(
-        enemy.x - game.playerX,
-        enemy.y - game.playerY
-      );
-
-    if (
-      distance < closest &&
-      distance < 130
-    ) {
-
-      closest = distance;
-
-      target = enemy;
-
-    }
-
-  });
-
-
-  if (!target) {
-
-    log("Move closer to an enemy!");
-
-    return;
-
-  }
-
-
-  let damage =
-    game.damage +
-    Math.floor(
-      Math.random() * 10
+/* ============================================
+   CREATE ROOM
+============================================ */
+
+function createRoom(){
+
+    game.enemies=[];
+
+    /*
+       Remove old enemies/chests/etc.
+    */
+
+    dungeon
+    .querySelectorAll(
+        ".enemy,.goblin,.chest,.trap,.exit"
+    )
+    .forEach(
+        element=>element.remove()
     );
 
 
-  target.health -= damage;
+    /*
+       Boss
+    */
 
-  log(
-    `⚔️ You hit ${target.name} for ${damage} damage!`
-  );
+    if(
+        game.floor===
+        game.maxFloor
+    ){
 
+        dungeon.classList.add(
+            "bossRoom"
+        );
 
-  updateEnemyHealth(target);
+        createBoss();
 
+        createExit();
 
-  if (target.health <= 0) {
+        log(
+            "👑 You have reached the throne chamber."
+        );
 
-    defeatEnemy(target);
+        log(
+            "⚠️ Something powerful is waiting..."
+        );
 
-  } else {
-
-    enemyAttack(target);
-
-  }
-
-}
-
-
-/* =====================================================
-   FIREBALL
-   ===================================================== */
-
-function fireball() {
-
-  if (game.mana < 15) {
-
-    log("🔵 Not enough mana!");
-
-    return;
-
-  }
-
-
-  if (game.enemies.length === 0) {
-
-    log("There are no enemies.");
-
-    return;
-
-  }
-
-
-  let target = null;
-
-  let closest = Infinity;
-
-
-  game.enemies.forEach(enemy => {
-
-    const distance =
-      Math.hypot(
-        enemy.x - game.playerX,
-        enemy.y - game.playerY
-      );
-
-    if (
-      distance < closest &&
-      distance < 220
-    ) {
-
-      closest = distance;
-
-      target = enemy;
-
-    }
-
-  });
-
-
-  if (!target) {
-
-    log(
-      "🔥 No enemy is close enough!"
-    );
-
-    return;
-
-  }
-
-
-  game.mana -= 15;
-
-
-  const damage =
-    35 +
-    game.level * 5;
-
-
-  target.health -= damage;
-
-
-  log(
-    `🔥 FIREBALL dealt ${damage} damage to ${target.name}!`
-  );
-
-
-  updateEnemyHealth(target);
-
-
-  if (target.health <= 0) {
-
-    defeatEnemy(target);
-
-  } else {
-
-    enemyAttack(target);
-
-  }
-
-
-  updateHUD();
-
-}
-
-
-/* =====================================================
-   ENEMY ATTACK
-   ===================================================== */
-
-function enemyAttack(enemy) {
-
-  const damage =
-    enemy.damage +
-    Math.floor(
-      Math.random() * 5
-    );
-
-  game.health -= damage;
-
-  log(
-    `💥 ${enemy.name} hit you for ${damage} damage!`
-  );
-
-  updateHUD();
-
-  if (game.health <= 0) {
-
-    loseGame();
-
-  }
-
-}
-
-
-/* =====================================================
-   DEFEAT ENEMY
-   ===================================================== */
-
-function defeatEnemy(enemy) {
-
-  log(
-    `💀 ${enemy.name} defeated! +${enemy.xp} XP +${enemy.gold} gold`
-  );
-
-
-  game.xp += enemy.xp;
-
-  game.gold += enemy.gold;
-
-
-  enemy.element.remove();
-
-
-  game.enemies =
-    game.enemies.filter(
-      e => e !== enemy
-    );
-
-
-  checkLevelUp();
-
-
-  if (
-    game.room === game.maxRooms &&
-    game.enemies.length === 0
-  ) {
-
-    winGame();
-
-  }
-
-  updateHUD();
-
-}
-
-
-/* =====================================================
-   ENEMY HEALTH BAR
-   ===================================================== */
-
-function updateEnemyHealth(enemy) {
-
-  const bar =
-    enemy.element.querySelector(
-      ".enemy-hp-bar"
-    );
-
-  if (!bar) {
-    return;
-  }
-
-  bar.style.width =
-    `${Math.max(
-      0,
-      enemy.health /
-      enemy.maxHealth *
-      100
-    )}%`;
-
-}
-
-
-/* =====================================================
-   LEVEL UP
-   ===================================================== */
-
-function checkLevelUp() {
-
-  while (
-    game.xp >= game.xpNeeded
-  ) {
-
-    game.xp -= game.xpNeeded;
-
-    game.level++;
-
-    game.xpNeeded =
-      Math.floor(
-        game.xpNeeded * 1.35
-      );
-
-    game.maxHealth += 20;
-
-    game.health =
-      game.maxHealth;
-
-    game.maxMana += 10;
-
-    game.mana =
-      game.maxMana;
-
-    game.damage += 5;
-
-
-    log(
-      `🎉 LEVEL UP! You are now level ${game.level}!`
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   CHESTS
-   ===================================================== */
-
-function createChest() {
-
-  const chest =
-    document.createElement("div");
-
-  chest.className = "chest";
-
-  chest.textContent = "🧰";
-
-  chest.style.left =
-    (100 +
-    Math.random() *
-    Math.max(
-      100,
-      room.clientWidth - 180
-    )) + "px";
-
-  chest.style.top =
-    (100 +
-    Math.random() *
-    Math.max(
-      100,
-      room.clientHeight - 180
-    )) + "px";
-
-
-  chest.onclick = function() {
-
-    openChest(chest);
-
-  };
-
-
-  room.appendChild(chest);
-
-  game.chests.push(chest);
-
-}
-
-
-/* =====================================================
-   OPEN CHEST
-   ===================================================== */
-
-function openChest(chest) {
-
-  const rewards = [
-
-    "gold",
-
-    "potion",
-
-    "health",
-
-    "weapon",
-
-    "armor"
-
-  ];
-
-
-  const reward =
-    rewards[
-      Math.floor(
-        Math.random() *
-        rewards.length
-      )
-    ];
-
-
-  if (reward === "gold") {
-
-    const amount =
-      20 +
-      Math.floor(
-        Math.random() * 50
-      );
-
-    game.gold += amount;
-
-    log(
-      `🪙 Chest contained ${amount} gold!`
-    );
-
-  }
-
-
-  if (reward === "potion") {
-
-    game.potions++;
-
-    log(
-      "🧪 You found a health potion!"
-    );
-
-  }
-
-
-  if (reward === "health") {
-
-    const amount = 30;
-
-    game.health =
-      Math.min(
-        game.maxHealth,
-        game.health + amount
-      );
-
-    log(
-      "❤️ The chest restored 30 health!"
-    );
-
-  }
-
-
-  if (reward === "weapon") {
-
-    game.weapon = "Steel Sword";
-
-    game.damage += 12;
-
-    log(
-      "⚔️ You found a Steel Sword! Damage increased!"
-    );
-
-  }
-
-
-  if (reward === "armor") {
-
-    game.armor = "Iron Armor";
-
-    log(
-      "🛡️ You found Iron Armor! Enemies deal less damage."
-    );
-
-  }
-
-
-  chest.remove();
-
-  updateHUD();
-
-}
-
-
-/* =====================================================
-   TRAPS
-   ===================================================== */
-
-function createTrap() {
-
-  const trap =
-    document.createElement("div");
-
-  trap.className = "trap";
-
-  trap.textContent = "⚠️";
-
-  trap.style.left =
-    (180 +
-    Math.random() *
-    Math.max(
-      100,
-      room.clientWidth - 250
-    )) + "px";
-
-  trap.style.top =
-    (150 +
-    Math.random() *
-    Math.max(
-      100,
-      room.clientHeight - 220
-    )) + "px";
-
-
-  room.appendChild(trap);
-
-  game.traps.push({
-
-    element: trap,
-
-    triggered: false
-
-  });
-
-}
-
-
-/* =====================================================
-   LOOT
-   ===================================================== */
-
-function createLoot() {
-
-  const loot =
-    document.createElement("div");
-
-  loot.className = "item";
-
-  loot.textContent = "💎";
-
-  loot.style.left =
-    (150 +
-    Math.random() *
-    Math.max(
-      100,
-      room.clientWidth - 220
-    )) + "px";
-
-  loot.style.top =
-    (100 +
-    Math.random() *
-    Math.max(
-      100,
-      room.clientHeight - 180
-    )) + "px";
-
-
-  loot.onclick = function() {
-
-    const value =
-      10 +
-      Math.floor(
-        Math.random() * 30
-      );
-
-    game.gold += value;
-
-    log(
-      `💎 You collected a gem worth ${value} gold!`
-    );
-
-    loot.remove();
-
-    updateHUD();
-
-  };
-
-
-  room.appendChild(loot);
-
-}
-
-
-/* =====================================================
-   EXIT
-   ===================================================== */
-
-function createExit() {
-
-  const exit =
-    document.createElement("div");
-
-  exit.className = "exit";
-
-  exit.textContent = "🚪";
-
-  exit.onclick = function() {
-
-    if (game.enemies.length > 0) {
-
-      log(
-        "🚪 Defeat all enemies before leaving!"
-      );
-
-      return;
-
-    }
-
-    if (
-      game.room >=
-      game.maxRooms
-    ) {
-
-      winGame();
-
-      return;
+        return;
 
     }
 
 
-    game.room++;
-
-    if (
-      !game.visited.includes(
-        game.room
-      )
-    ) {
-
-      game.visited.push(
-        game.room
-      );
-
-    }
-
-
-    log(
-      `🚪 You entered dungeon room ${game.room}.`
+    dungeon.classList.remove(
+        "bossRoom"
     );
 
-    createRoom();
 
-    updateHUD();
+    /*
+       More enemies on deeper floors
+    */
 
-    renderMap();
-
-  };
-
-
-  room.appendChild(exit);
-
-}
-
-
-/* =====================================================
-   COLLISIONS
-   ===================================================== */
-
-function checkCollisions() {
-
-  /*
-    Traps
-  */
-
-  game.traps.forEach(trap => {
-
-    if (trap.triggered) {
-      return;
-    }
-
-    const rect =
-      trap.element.getBoundingClientRect();
-
-    const dungeonRect =
-      room.getBoundingClientRect();
-
-    const tx =
-      rect.left -
-      dungeonRect.left;
-
-    const ty =
-      rect.top -
-      dungeonRect.top;
-
-
-    const distance =
-      Math.hypot(
-        tx - game.playerX,
-        ty - game.playerY
-      );
-
-
-    if (distance < 50) {
-
-      trap.triggered = true;
-
-      let damage = 15;
-
-      if (
-        game.armor === "Iron Armor"
-      ) {
-
-        damage = 8;
-
-      }
-
-      game.health -= damage;
-
-      trap.element.textContent =
-        "💥";
-
-      log(
-        `⚠️ You stepped on a trap! -${damage} health`
-      );
-
-      updateHUD();
-
-      if (game.health <= 0) {
-
-        loseGame();
-
-      }
-
-    }
-
-  });
-
-
-  /*
-    Enemies can damage player
-    when player gets very close.
-  */
-
-}
-
-
-/* =====================================================
-   POTION
-   ===================================================== */
-
-function usePotion() {
-
-  if (game.potions <= 0) {
-
-    log(
-      "🧪 You don't have any potions!"
-    );
-
-    return;
-
-  }
-
-  if (
-    game.health >=
-    game.maxHealth
-  ) {
-
-    log(
-      "❤️ Your health is already full!"
-    );
-
-    return;
-
-  }
-
-
-  game.potions--;
-
-  const healing = 40;
-
-  game.health =
+    const count=
     Math.min(
-      game.maxHealth,
-      game.health + healing
+        6,
+        1+
+        Math.floor(
+            game.floor/2
+        )
     );
 
-  log(
-    `🧪 Potion restored ${healing} health!`
-  );
 
-  updateHUD();
+    for(
+        let i=0;
+        i<count;
+        i++
+    ){
 
-}
-
-
-/* =====================================================
-   WIN
-   ===================================================== */
-
-function winGame() {
-
-  game.gameOver = true;
-
-  document.getElementById(
-    "overlay"
-  ).style.display = "flex";
-
-  document.getElementById(
-    "overlayTitle"
-  ).textContent =
-    "🏆 Dungeon Conquered!";
-
-  document.getElementById(
-    "overlayText"
-  ).textContent =
-    `You defeated the Dungeon Lord and escaped with ${game.gold} gold!`;
-
-}
-
-
-/* =====================================================
-   LOSE
-   ===================================================== */
-
-function loseGame() {
-
-  game.gameOver = true;
-
-  document.getElementById(
-    "overlay"
-  ).style.display = "flex";
-
-  document.getElementById(
-    "overlayTitle"
-  ).textContent =
-    "💀 You Were Defeated";
-
-  document.getElementById(
-    "overlayText"
-  ).textContent =
-    `You reached room ${game.room} and collected ${game.gold} gold.`;
-
-}
-
-
-/* =====================================================
-   RESTART
-   ===================================================== */
-
-function restartGame() {
-
-  location.reload();
-
-}
-
-
-/* =====================================================
-   PASSIVE ENEMY MOVEMENT
-   ===================================================== */
-
-setInterval(function() {
-
-  if (
-    game.gameOver ||
-    game.enemies.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  game.enemies.forEach(enemy => {
-
-    const dx =
-      game.playerX - enemy.x;
-
-    const dy =
-      game.playerY - enemy.y;
-
-    const distance =
-      Math.hypot(dx, dy);
-
-
-    if (
-      distance < 250 &&
-      distance > 65
-    ) {
-
-      enemy.x +=
-        (dx / distance) * 5;
-
-      enemy.y +=
-        (dy / distance) * 5;
-
-
-      enemy.element.style.left =
-        enemy.x + "px";
-
-      enemy.element.style.top =
-        enemy.y + "px";
+        createEnemy();
 
     }
 
 
     /*
-      Enemies attack when very close
+       Treasure
     */
 
-    if (distance < 65) {
+    if(
+        Math.random()<.75
+    ){
 
-      if (
-        Math.random() < 0.04
-      ) {
-
-        enemyAttack(enemy);
-
-      }
+        createChest();
 
     }
 
-  });
 
-}, 100);
+    /*
+       Trap
+    */
+
+    if(
+        Math.random()<.6
+    ){
+
+        createTrap();
+
+    }
 
 
-/* =====================================================
-   MANA REGEN
-   ===================================================== */
+    createExit();
 
-setInterval(function() {
+}
 
-  if (game.gameOver) {
-    return;
-  }
 
-  game.mana =
-    Math.min(
-      game.maxMana,
-      game.mana + 2
+/* ============================================
+   CREATE ENEMY
+============================================ */
+
+function createEnemy(){
+
+    const type=
+    enemyTypes[
+        Math.floor(
+            Math.random()*
+            enemyTypes.length
+        )
+    ];
+
+
+    const enemy={
+
+        name:type.name,
+
+        emoji:type.emoji,
+
+        health:
+        type.hp+
+        game.floor*8,
+
+        maxHealth:
+        type.hp+
+        game.floor*8,
+
+        damage:
+        type.damage+
+        Math.floor(
+            game.floor/2
+        ),
+
+        xp:type.xp,
+
+        gold:type.gold,
+
+        x:
+        180+
+        Math.random()*
+        Math.max(
+            100,
+            dungeon.clientWidth-350
+        ),
+
+        y:
+        100+
+        Math.random()*
+        Math.max(
+            100,
+            dungeon.clientHeight-230
+        ),
+
+        element:null
+
+    };
+
+
+    const el=
+    document.createElement("div");
+
+
+    /*
+       Detailed goblin appearance
+    */
+
+    if(
+        type.name.includes(
+            "Goblin"
+        )
+    ){
+
+        el.className="goblin";
+
+        el.innerHTML=`
+            <div class="enemyHP">
+                <div
+                class="enemyHPbar"
+                style="width:100%">
+                </div>
+            </div>
+        `;
+
+    }else{
+
+        el.className="enemy";
+
+        el.innerHTML=`
+            <div class="enemyHP">
+                <div
+                class="enemyHPbar"
+                style="width:100%">
+                </div>
+            </div>
+            ${enemy.emoji}
+        `;
+
+    }
+
+
+    el.style.left=
+    enemy.x+"px";
+
+    el.style.top=
+    enemy.y+"px";
+
+
+    dungeon.appendChild(el);
+
+    enemy.element=el;
+
+    game.enemies.push(enemy);
+
+}
+
+
+/* ============================================
+   BOSS
+============================================ */
+
+function createBoss(){
+
+    const boss={
+
+        name:"Ancient Dungeon King",
+
+        emoji:"👑",
+
+        health:500,
+
+        maxHealth:500,
+
+        damage:24,
+
+        xp:600,
+
+        gold:350,
+
+        x:
+        dungeon.clientWidth/2-40,
+
+        y:240,
+
+        element:null
+
+    };
+
+
+    const el=
+    document.createElement("div");
+
+
+    el.className="enemy";
+
+    el.style.width="90px";
+    el.style.height="100px";
+
+    el.style.fontSize="55px";
+
+    el.style.background=
+    "radial-gradient(circle,#6b274f,#160d18)";
+
+    el.style.border=
+    "4px solid #c75cff";
+
+    el.style.boxShadow=
+    "0 0 35px #d05cffaa";
+
+
+    el.innerHTML=`
+
+        <div class="enemyHP">
+
+            <div
+            class="enemyHPbar"
+            style="width:100%">
+            </div>
+
+        </div>
+
+        👑
+
+    `;
+
+
+    el.style.left=
+    boss.x+"px";
+
+    el.style.top=
+    boss.y+"px";
+
+
+    dungeon.appendChild(el);
+
+    boss.element=el;
+
+    game.enemies.push(boss);
+
+
+    log(
+        "👑 THE ANCIENT DUNGEON KING AWAKENS!"
     );
 
-  updateHUD();
-
-}, 1000);
+}
 
 
-/* =====================================================
-   START GAME
-   ===================================================== */
+/* ============================================
+   ATTACK
+============================================ */
 
-function startGame() {
+function attack(){
 
-  game.visited = [1];
+    if(game.gameOver)
+        return;
 
-  createRoom();
 
-  updateHUD();
+    let target=null;
 
-  renderMap();
+    let closest=Infinity;
 
-  log(
-    "⚔️ Welcome to Dungeon Dash!"
-  );
 
-  log(
-    "Explore the rooms and defeat the monsters."
-  );
+    game.enemies.forEach(
+    enemy=>{
 
-  log(
-    "💡 Tip: Stay near enemies when attacking."
-  );
+        const distance=
+        Math.hypot(
+            enemy.x-game.playerX,
+            enemy.y-game.playerY
+        );
+
+
+        if(
+            distance<
+            closest &&
+            distance<145
+        ){
+
+            closest=distance;
+            target=enemy;
+
+        }
+
+    });
+
+
+    if(!target){
+
+        message(
+            "Move closer to an enemy!"
+        );
+
+        return;
+
+    }
+
+
+    const damage=
+    game.damage+
+    Math.floor(
+        Math.random()*10
+    );
+
+
+    target.health-=damage;
+
+
+    log(
+        `⚔️ You hit ${target.name} for ${damage} damage.`
+    );
+
+
+    updateEnemyHP(target);
+
+
+    if(
+        target.health<=0
+    ){
+
+        defeatEnemy(target);
+
+    }else{
+
+        enemyAttack(target);
+
+    }
+
+}
+
+
+/* ============================================
+   MAGIC
+============================================ */
+
+function fireball(){
+
+    if(
+        game.mana<20
+    ){
+
+        log(
+            "🔵 You need more mana."
+        );
+
+        return;
+
+    }
+
+
+    let target=null;
+
+    let closest=Infinity;
+
+
+    game.enemies.forEach(
+    enemy=>{
+
+        const distance=
+        Math.hypot(
+            enemy.x-game.playerX,
+            enemy.y-game.playerY
+        );
+
+
+        if(
+            distance<
+            closest &&
+            distance<260
+        ){
+
+            closest=distance;
+            target=enemy;
+
+        }
+
+    });
+
+
+    if(!target){
+
+        log(
+            "🔥 No enemy is close enough."
+        );
+
+        return;
+
+    }
+
+
+    game.mana-=20;
+
+
+    const damage=
+    35+
+    game.level*7;
+
+
+    target.health-=damage;
+
+
+    log(
+        `🔥 Arcane Blast dealt ${damage} damage!`
+    );
+
+
+    updateEnemyHP(target);
+
+
+    if(
+        target.health<=0
+    ){
+
+        defeatEnemy(target);
+
+    }else{
+
+        enemyAttack(target);
+
+    }
+
+
+    updateHUD();
+
+}
+
+
+/* ============================================
+   ENEMY ATTACK
+============================================ */
+
+function enemyAttack(enemy){
+
+    let damage=
+    enemy.damage+
+    Math.floor(
+        Math.random()*5
+    );
+
+
+    if(
+        game.armor==="Knight Armor"
+    ){
+
+        damage=
+        Math.max(
+            1,
+            damage-6
+        );
+
+    }
+
+
+    game.health-=damage;
+
+
+    log(
+        `💥 ${enemy.name} attacked you for ${damage} damage.`
+    );
+
+
+    if(
+        game.health<=0
+    ){
+
+        loseGame();
+
+    }
+
+
+    updateHUD();
+
+}
+
+
+/* ============================================
+   ENEMY HP
+============================================ */
+
+function updateEnemyHP(enemy){
+
+    const bar=
+    enemy.element
+    .querySelector(
+        ".enemyHPbar"
+    );
+
+
+    if(!bar)
+        return;
+
+
+    bar.style.width=
+    `${Math.max(
+        0,
+        enemy.health/
+        enemy.maxHealth*
+        100
+    )}%`;
+
+}
+
+
+/* ============================================
+   DEFEAT
+============================================ */
+
+function defeatEnemy(enemy){
+
+    game.xp+=enemy.xp;
+
+    game.gold+=enemy.gold;
+
+
+    log(
+        `✨ ${enemy.name} defeated! +${enemy.xp} XP +${enemy.gold} gold.`
+    );
+
+
+    enemy.element.remove();
+
+
+    game.enemies=
+    game.enemies.filter(
+        e=>e!==enemy
+    );
+
+
+    checkLevelUp();
+
+
+    if(
+        game.floor===
+        game.maxFloor &&
+        game.enemies.length===0
+    ){
+
+        winGame();
+
+    }
+
+
+    updateHUD();
+
+}
+
+
+/* ============================================
+   LEVEL UP
+============================================ */
+
+function checkLevelUp(){
+
+    while(
+        game.xp>=
+        game.xpNeeded
+    ){
+
+        game.xp-=
+        game.xpNeeded;
+
+        game.level++;
+
+        game.xpNeeded=
+        Math.floor(
+            game.xpNeeded*1.35
+        );
+
+        game.maxHealth+=20;
+
+        game.health=
+        game.maxHealth;
+
+        game.maxMana+=10;
+
+        game.mana=
+        game.maxMana;
+
+        game.damage+=6;
+
+
+        log(
+            `🎉 LEVEL UP! You reached level ${game.level}!`
+        );
+
+    }
+
+}
+
+
+/* ============================================
+   CHEST
+============================================ */
+
+function createChest(){
+
+    const chest=
+    document.createElement("div");
+
+    chest.className="chest";
+
+    chest.textContent="🧰";
+
+    chest.style.left=
+    (
+        160+
+        Math.random()*
+        Math.max(
+            100,
+            dungeon.clientWidth-260
+        )
+    )+"px";
+
+    chest.style.top=
+    (
+        130+
+        Math.random()*
+        Math.max(
+            100,
+            dungeon.clientHeight-240
+        )
+    )+"px";
+
+
+    chest.onclick=
+    ()=>openChest(chest);
+
+
+    dungeon.appendChild(chest);
+
+}
+
+
+/* ============================================
+   OPEN CHEST
+============================================ */
+
+function openChest(chest){
+
+    const rewards=[
+        "gold",
+        "potion",
+        "health",
+        "weapon",
+        "armor"
+    ];
+
+
+    const reward=
+    rewards[
+        Math.floor(
+            Math.random()*
+            rewards.length
+        )
+    ];
+
+
+    if(
+        reward==="gold"
+    ){
+
+        const amount=
+        25+
+        Math.floor(
+            Math.random()*50
+        );
+
+        game.gold+=amount;
+
+        log(
+            `🪙 You found ${amount} gold!`
+        );
+
+    }
+
+
+    if(
+        reward==="potion"
+    ){
+
+        game.potions++;
+
+        log(
+            "🧪 You found a potion!"
+        );
+
+    }
+
+
+    if(
+        reward==="health"
+    ){
+
+        game.health=
+        Math.min(
+            game.maxHealth,
+            game.health+35
+        );
+
+        log(
+            "❤️ The chest restored some health!"
+        );
+
+    }
+
+
+    if(
+        reward==="weapon"
+    ){
+
+        game.weapon=
+        "Crystal Blade";
+
+        game.damage+=15;
+
+        log(
+            "⚔️ You found the Crystal Blade!"
+        );
+
+    }
+
+
+    if(
+        reward==="armor"
+    ){
+
+        game.armor=
+        "Knight Armor";
+
+        log(
+            "🛡️ You found Knight Armor!"
+        );
+
+    }
+
+
+    chest.remove();
+
+    updateHUD();
+
+}
+
+
+/* ============================================
+   TRAP
+============================================ */
+
+function createTrap(){
+
+    const trap=
+    document.createElement("div");
+
+    trap.className="trap";
+
+    trap.textContent="⚠️";
+
+    trap.style.left=
+    (
+        170+
+        Math.random()*
+        Math.max(
+            100,
+            dungeon.clientWidth-270
+        )
+    )+"px";
+
+    trap.style.top=
+    (
+        150+
+        Math.random()*
+        Math.max(
+            100,
+            dungeon.clientHeight-250
+        )
+    )+"px";
+
+
+    dungeon.appendChild(trap);
+
+
+    trap.dataset.active="true";
+
+}
+
+
+/* ============================================
+   EXIT
+============================================ */
+
+function createExit(){
+
+    const exit=
+    document.createElement("div");
+
+    exit.className="exit";
+
+    exit.textContent="🚪";
+
+
+    exit.onclick=
+    function(){
+
+        if(
+            game.enemies.length>0
+        ){
+
+            log(
+                "🚪 Defeat every enemy before opening the door!"
+            );
+
+            return;
+
+        }
+
+
+        if(
+            game.floor>=
+            game.maxFloor
+        ){
+
+            winGame();
+
+            return;
+
+        }
+
+
+        game.floor++;
+
+        game.visited.push(
+            game.floor
+        );
+
+
+        game.health=
+        Math.min(
+            game.maxHealth,
+            game.health+10
+        );
+
+
+        game.mana=
+        Math.min(
+            game.maxMana,
+            game.mana+15
+        );
+
+
+        log(
+            `🚪 You entered floor ${game.floor}.`
+        );
+
+
+        createRoom();
+
+        updateHUD();
+
+        renderMap();
+
+    };
+
+
+    dungeon.appendChild(exit);
+
+}
+
+
+/* ============================================
+   POTION
+============================================ */
+
+function usePotion(){
+
+    if(
+        game.potions<=0
+    ){
+
+        log(
+            "🧪 You don't have any potions!"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        game.health>=
+        game.maxHealth
+    ){
+
+        log(
+            "❤️ Your health is already full!"
+        );
+
+        return;
+
+    }
+
+
+    game.potions--;
+
+    game.health=
+    Math.min(
+        game.maxHealth,
+        game.health+45
+    );
+
+
+    log(
+        "🧪 You restored 45 health."
+    );
+
+
+    updateHUD();
+
+}
+
+
+/* ============================================
+   ENEMY MOVEMENT
+============================================ */
+
+function enemyAI(){
+
+    if(game.gameOver)
+        return;
+
+
+    game.enemies.forEach(
+    enemy=>{
+
+        const dx=
+        game.playerX-
+        enemy.x;
+
+        const dy=
+        game.playerY-
+        enemy.y;
+
+        const distance=
+        Math.hypot(dx,dy);
+
+
+        if(
+            distance<300 &&
+            distance>70
+        ){
+
+            enemy.x+=
+            dx/distance*2.5;
+
+            enemy.y+=
+            dy/distance*2.5;
+
+
+            enemy.element.style.left=
+            enemy.x+"px";
+
+            enemy.element.style.top=
+            enemy.y+"px";
+
+        }
+
+
+        if(
+            distance<70
+        ){
+
+            if(
+                Math.random()<.025
+            ){
+
+                enemyAttack(enemy);
+
+            }
+
+        }
+
+    });
+
+}
+
+
+setInterval(
+    enemyAI,
+    100
+);
+
+
+/* ============================================
+   MANA REGEN
+============================================ */
+
+setInterval(
+function(){
+
+    if(game.gameOver)
+        return;
+
+    game.mana=
+    Math.min(
+        game.maxMana,
+        game.mana+2
+    );
+
+    updateHUD();
+
+},
+1000
+);
+
+
+/* ============================================
+   LOSE
+============================================ */
+
+function loseGame(){
+
+    game.gameOver=true;
+
+    document.getElementById(
+        "overlay"
+    ).style.display="flex";
+
+    document.getElementById(
+        "overlayTitle"
+    ).textContent=
+    "💀 Dungeon Over";
+
+    document.getElementById(
+        "overlayText"
+    ).textContent=
+    `You reached floor ${game.floor} and collected ${game.gold} gold.`;
+
+}
+
+
+/* ============================================
+   WIN
+============================================ */
+
+function winGame(){
+
+    game.gameOver=true;
+
+    document.getElementById(
+        "overlay"
+    ).style.display="flex";
+
+    document.getElementById(
+        "overlayTitle"
+    ).textContent=
+    "🏆 DUNGEON CONQUERED!";
+
+    document.getElementById(
+        "overlayText"
+    ).textContent=
+    `You defeated the Ancient Dungeon King and escaped with ${game.gold} gold!`;
+
+}
+
+
+/* ============================================
+   COLLISION CHECK
+============================================ */
+
+setInterval(
+function(){
+
+    if(game.gameOver)
+        return;
+
+
+    document
+    .querySelectorAll(".trap")
+    .forEach(
+    trap=>{
+
+        if(
+            trap.dataset.active!=="true"
+        )
+            return;
+
+
+        const x=
+        parseFloat(
+            trap.style.left
+        );
+
+        const y=
+        parseFloat(
+            trap.style.top
+        );
+
+
+        const distance=
+        Math.hypot(
+            x-game.playerX,
+            y-game.playerY
+        );
+
+
+        if(
+            distance<55
+        ){
+
+            trap.dataset.active=
+            "false";
+
+            game.health-=12;
+
+            trap.textContent="💥";
+
+            log(
+                "⚠️ You stepped on a dungeon trap!"
+            );
+
+            updateHUD();
+
+
+            setTimeout(
+            ()=>trap.remove(),
+            500
+            );
+
+
+            if(
+                game.health<=0
+            ){
+
+                loseGame();
+
+            }
+
+        }
+
+    });
+
+},
+100
+);
+
+
+/* ============================================
+   START
+============================================ */
+
+function startGame(){
+
+    updatePlayer();
+
+    updateHUD();
+
+    renderMap();
+
+    createRoom();
+
+
+    log(
+        "🏰 Welcome to the Deep Dungeon Update!"
+    );
+
+    log(
+        "🗺️ Explore all 10 floors."
+    );
+
+    log(
+        "👺 The goblins become stronger deeper underground."
+    );
+
+    log(
+        "💡 Search chests for better equipment."
+    );
 
 }
 
