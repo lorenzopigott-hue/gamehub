@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameHub — Free Browser Games</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="index.html">🎮 <span>GameHub</span></a>
+    <nav>
+      <a href="#games">Games</a>
+      <a href="#categories">Categories</a>
+      <button id="themeBtn" class="icon-btn" title="Toggle theme">🌙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">BROWSER GAME PORTAL</p>
+        <h1>Play something awesome.</h1>
+        <p class="hero-text">A clean starter game site for your own games and games you are allowed to distribute.</p>
+        <div class="search-wrap">
+          <span>🔎</span>
+          <input id="searchInput" type="search" placeholder="Search games..." autocomplete="off">
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-controller">🕹️</div>
+        <strong id="gameCount">0 games</strong>
+        <span>Ready to play</span>
+      </div>
+    </section>
+
+    <section id="categories" class="section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">EXPLORE</p>
+          <h2>Categories</h2>
+        </div>
+      </div>
+      <div id="categoryList" class="categories"></div>
+    </section>
+
+    <section id="games" class="section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LIBRARY</p>
+          <h2>Games</h2>
+        </div>
+        <select id="sortSelect">
+          <option value="featured">Featured</option>
+          <option value="newest">Newest</option>
+          <option value="name">Name</option>
+        </select>
+      </div>
+      <div id="gameGrid" class="game-grid"></div>
+      <div id="emptyState" class="empty hidden">
+        <div>🔎</div>
+        <h3>No games found</h3>
+        <p>Try another search or category.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>🎮 GameHub</strong>
+    <span>Built as a starter template. Add only games you own or have permission to distribute.</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
