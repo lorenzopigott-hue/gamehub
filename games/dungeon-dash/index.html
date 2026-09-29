@@ -3,1944 +3,1902 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Dungeon Dash - Roguelike</title>
+<title>Dungeon Dash</title>
 
 <style>
 *{
     box-sizing:border-box;
+    user-select:none;
 }
 
 body{
     margin:0;
-    background:#050509;
+    background:#090909;
     color:white;
     font-family:Arial,sans-serif;
     overflow:hidden;
 }
 
-#game{
-    width:100vw;
-    height:100vh;
-    position:relative;
-    overflow:hidden;
-    background:#08080d;
-}
-
-/* HUD */
-
 #hud{
-    position:absolute;
+    position:fixed;
     top:0;
     left:0;
-    width:100%;
+    right:0;
     height:72px;
-    z-index:100;
+    background:#151515;
+    border-bottom:2px solid #444;
     display:flex;
     align-items:center;
-    gap:14px;
-    padding:8px 15px;
-    background:rgba(8,8,14,.94);
-    border-bottom:2px solid #292936;
+    gap:15px;
+    padding:8px 14px;
+    z-index:20;
 }
 
-.hudBox{
-    min-width:105px;
+.stat{
+    min-width:130px;
 }
 
 .label{
-    font-size:11px;
-    color:#999;
-    text-transform:uppercase;
-}
-
-.value{
-    font-weight:bold;
-    font-size:18px;
+    font-size:12px;
+    color:#aaa;
 }
 
 .bar{
-    width:140px;
+    width:130px;
     height:13px;
-    background:#181820;
-    border:1px solid #444;
+    background:#333;
     border-radius:8px;
     overflow:hidden;
 }
 
 #hpBar{
-    width:100%;
     height:100%;
-    background:#c62828;
+    background:#e53935;
+    width:100%;
 }
 
 #manaBar{
-    width:100%;
     height:100%;
-    background:#2468d8;
+    background:#1976d2;
+    width:100%;
 }
 
-#floorText{
-    color:#f4c542;
-}
-
-/* WORLD */
-
-#world{
-    position:absolute;
+#game{
+    position:fixed;
     left:0;
     right:0;
     top:72px;
     bottom:0;
     overflow:hidden;
     background:
-        radial-gradient(circle,#24242a 0%,#111117 55%,#07070b 100%);
+        radial-gradient(circle at 50% 45%,#333 0%,#191919 35%,#0d0d0d 100%);
 }
 
-/* dungeon floor */
-
-#floorPattern{
+#floor{
     position:absolute;
     inset:0;
-    opacity:.25;
-    background:
-        linear-gradient(90deg,#0000 48%,#444 49%,#0000 51%),
-        linear-gradient(#0000 48%,#444 49%,#0000 51%);
-    background-size:70px 70px;
+    background-image:
+        linear-gradient(#ffffff08 1px,transparent 1px),
+        linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+    background-size:55px 55px;
 }
 
-/* PLAYER */
+.wall{
+    position:absolute;
+    background:linear-gradient(#555,#222);
+    border:3px solid #111;
+    box-shadow:0 5px 12px #000;
+}
 
 #player{
     position:absolute;
-    width:48px;
-    height:58px;
-    z-index:40;
-    transition:transform .05s linear;
+    width:46px;
+    height:54px;
+    background:linear-gradient(#79b7ff,#2450a8);
+    border:3px solid #b9dcff;
+    border-radius:12px;
+    z-index:8;
+    box-shadow:0 0 15px #4285f4;
 }
 
-.playerBody{
+#player::after{
+    content:"⚔️";
     position:absolute;
+    font-size:27px;
     left:7px;
-    top:18px;
-    width:34px;
-    height:36px;
-    background:#7136b5;
-    border:3px solid #30154f;
-    border-radius:12px 12px 7px 7px;
-    box-shadow:0 0 14px #7b42c7;
+    top:11px;
 }
-
-.playerHead{
-    position:absolute;
-    left:11px;
-    top:2px;
-    width:27px;
-    height:27px;
-    border-radius:50%;
-    background:#d49b68;
-    border:2px solid #432818;
-    z-index:2;
-}
-
-.playerEye{
-    position:absolute;
-    left:17px;
-    top:13px;
-    width:4px;
-    height:4px;
-    background:white;
-    box-shadow:9px 0 white;
-    z-index:5;
-}
-
-/* OBJECTS */
-
-.object{
-    position:absolute;
-    z-index:20;
-}
-
-.chest{
-    width:48px;
-    height:38px;
-    background:#7a4a20;
-    border:3px solid #d79b32;
-    border-radius:5px;
-    box-shadow:0 0 12px #d79b3255;
-}
-
-.chest:before{
-    content:"";
-    position:absolute;
-    top:-8px;
-    left:2px;
-    width:38px;
-    height:15px;
-    border:3px solid #d79b32;
-    border-bottom:none;
-    border-radius:50% 50% 0 0;
-}
-
-.statue{
-    width:45px;
-    height:65px;
-    background:#777780;
-    border:3px solid #36363c;
-    clip-path:polygon(
-        25% 0,75% 0,
-        100% 25%,82% 100%,
-        18% 100%,0 25%
-    );
-}
-
-.potion{
-    width:27px;
-    height:34px;
-    border-radius:7px 7px 12px 12px;
-    background:#a42bd4;
-    border:3px solid #e39cff;
-    box-shadow:0 0 14px #b62cff;
-}
-
-.weapon{
-    width:55px;
-    height:10px;
-    background:#d5d5d5;
-    transform:rotate(-35deg);
-    border-radius:5px;
-    box-shadow:0 0 10px white;
-}
-
-.weapon:after{
-    content:"";
-    position:absolute;
-    left:-12px;
-    top:-3px;
-    width:18px;
-    height:16px;
-    background:#6e421f;
-}
-
-/* DOOR */
-
-.door{
-    width:65px;
-    height:90px;
-    background:#402818;
-    border:5px solid #80613c;
-    border-radius:8px 8px 0 0;
-    box-shadow:0 0 15px #000;
-}
-
-.door.locked{
-    border-color:#963434;
-}
-
-.door.open{
-    background:#111;
-    border-color:#aaa;
-}
-
-/* SECRET */
-
-.secret{
-    width:50px;
-    height:50px;
-    border:3px dashed #7e54bd;
-    background:#24183a;
-}
-
-/* ENEMIES */
 
 .enemy{
     position:absolute;
-    width:52px;
-    height:55px;
-    z-index:30;
-    border-radius:45% 45% 35% 35%;
-    border:3px solid #341d1d;
-    box-shadow:0 8px 15px #000;
-}
-
-.goblin{
-    background:
-        radial-gradient(circle at 35% 30%,#a9d86b 0 8%,transparent 9%),
-        #547b38;
-}
-
-.skeleton{
-    background:
-        radial-gradient(circle at 35% 35%,white 0 7%,transparent 8%),
-        radial-gradient(circle at 65% 35%,white 0 7%,transparent 8%),
-        #777;
-}
-
-.orc{
-    background:#385b34;
-    width:65px;
-    height:65px;
-}
-
-.mage{
-    background:#372c74;
-    border-color:#8b6ee8;
-}
-
-.enemyHP{
-    position:absolute;
-    top:-10px;
-    left:0;
-    width:100%;
-    height:6px;
-    background:#311010;
-}
-
-.enemyHP div{
-    height:100%;
-    background:#e33;
-}
-
-/* BOSS */
-
-.boss{
-    width:100px;
-    height:105px;
-    background:#501d62;
-    border:4px solid #c04cff;
-    box-shadow:
-        0 0 20px #b638ff,
-        0 0 50px #5b1682;
-}
-
-/* INTERACTION */
-
-#interaction{
-    position:absolute;
-    bottom:100px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:150;
-    padding:10px 18px;
-    border:2px solid #f4c542;
-    background:rgba(10,10,15,.94);
-    border-radius:8px;
-    color:#fff;
-    font-weight:bold;
-    display:none;
-    text-align:center;
-}
-
-#interaction small{
-    display:block;
-    color:#aaa;
-    font-weight:normal;
-    margin-top:3px;
-}
-
-/* LOG */
-
-#log{
-    position:absolute;
-    right:12px;
-    bottom:12px;
-    width:270px;
-    height:145px;
-    z-index:120;
-    background:rgba(5,5,10,.88);
-    border:1px solid #333;
-    padding:9px;
-    overflow:hidden;
-    font-size:12px;
-}
-
-.logLine{
-    margin-bottom:5px;
-    color:#bbb;
-}
-
-/* START / GAMEOVER */
-
-.screen{
-    position:absolute;
-    inset:0;
-    z-index:300;
-    background:
-        radial-gradient(circle,#272033,#09080d 65%);
+    width:44px;
+    height:44px;
+    border-radius:10px;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    text-align:center;
+    font-size:27px;
+    z-index:6;
+    box-shadow:0 0 10px #000;
 }
 
-.screen h1{
-    font-size:58px;
-    margin:0;
-    color:#d8a74b;
-    text-shadow:0 0 20px #b96b27;
+.goblin{background:#356b32;}
+.skeleton{background:#777;}
+.orc{background:#693b22;}
+.mage{background:#54256e;}
+.boss{
+    width:65px;
+    height:65px;
+    background:#691919;
+    border:3px solid #ff4444;
+    font-size:40px;
 }
 
-.screen p{
-    max-width:600px;
-    color:#bbb;
-    line-height:1.6;
-}
-
-button{
-    border:2px solid #d8a74b;
-    background:#21180d;
-    color:#f4d58b;
-    padding:13px 25px;
-    margin:7px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-button:hover{
-    background:#3a2813;
-}
-
-/* MOBILE */
-
-#mobile{
+.npc{
     position:absolute;
-    bottom:20px;
-    left:20px;
-    z-index:200;
+    width:48px;
+    height:55px;
+    border-radius:12px;
+    background:linear-gradient(#a96cff,#4d1c86);
+    border:3px solid #d8b7ff;
+    z-index:7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:29px;
+    box-shadow:0 0 15px #a45cff;
+}
+
+.npc.quest{
+    box-shadow:0 0 20px #ffd43b;
+}
+
+.questMark{
+    position:absolute;
+    top:-27px;
+    left:15px;
+    color:#ffd43b;
+    font-size:22px;
+    animation:bob .7s infinite alternate;
+}
+
+@keyframes bob{
+    from{transform:translateY(0)}
+    to{transform:translateY(-6px)}
+}
+
+.chest,
+.item,
+.shrine{
+    position:absolute;
+    width:45px;
+    height:45px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    z-index:5;
+}
+
+.chest{background:#593817;border:2px solid #d69b43;border-radius:8px;}
+.item{background:#182d48;border:2px solid #6bb8ff;border-radius:50%;}
+.shrine{background:#30204f;border:2px solid #b76cff;border-radius:10px;}
+
+#interaction{
+    position:fixed;
+    bottom:105px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111d;
+    border:1px solid #ffd43b;
+    padding:9px 17px;
+    border-radius:9px;
+    display:none;
+    z-index:30;
+}
+
+#log{
+    position:fixed;
+    right:12px;
+    bottom:12px;
+    width:280px;
+    max-height:190px;
+    overflow:hidden;
+    background:#111d;
+    border:1px solid #444;
+    padding:10px;
+    font-size:13px;
+    z-index:30;
+}
+
+.logline{
+    margin:4px 0;
+    color:#ddd;
+}
+
+#questPanel{
+    position:fixed;
+    left:12px;
+    top:84px;
+    width:260px;
+    background:#111e;
+    border:1px solid #555;
+    border-radius:10px;
+    padding:10px;
+    z-index:25;
     display:none;
 }
 
-.mobileBtn{
-    width:52px;
-    height:52px;
-    margin:3px;
-    font-size:20px;
-    padding:0;
+#questPanel h3{
+    margin:0 0 8px;
+    color:#ffd43b;
 }
 
-#interactButton{
-    position:absolute;
+.questTitle{
+    font-weight:bold;
+    color:#fff;
+}
+
+.questProgress{
+    color:#aaa;
+    font-size:13px;
+    margin-top:4px;
+}
+
+.questReward{
+    color:#76e06f;
+    font-size:12px;
+    margin-top:5px;
+}
+
+#dialog{
+    position:fixed;
+    left:50%;
     bottom:25px;
-    right:25px;
-    z-index:200;
+    transform:translateX(-50%);
+    width:min(600px,90%);
+    background:#121212;
+    border:2px solid #8d5cff;
+    border-radius:12px;
+    padding:18px;
+    z-index:50;
+    display:none;
+    box-shadow:0 0 30px #000;
+}
+
+#dialogName{
+    color:#d0aaff;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+#dialogText{
+    line-height:1.5;
+    margin-bottom:12px;
+}
+
+.dialogButton{
+    background:#6c35d9;
+    color:white;
+    border:0;
+    padding:9px 15px;
+    border-radius:7px;
+    cursor:pointer;
+    margin-right:7px;
+}
+
+#startScreen,
+#deathScreen{
+    position:fixed;
+    inset:0;
+    background:#080808ee;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+
+#deathScreen{
     display:none;
 }
 
-/* damage */
+.bigTitle{
+    font-size:50px;
+    color:#b77cff;
+    text-shadow:0 0 20px #7b32d4;
+}
 
-.damage{
-    position:absolute;
-    color:#ff5555;
-    font-weight:bold;
+.startButton{
+    background:#713bd1;
+    border:0;
+    color:white;
+    padding:15px 30px;
+    border-radius:10px;
     font-size:18px;
-    z-index:200;
-    pointer-events:none;
-    animation:floatDamage .7s forwards;
+    cursor:pointer;
 }
 
-@keyframes floatDamage{
-    from{
-        opacity:1;
-        transform:translateY(0);
-    }
-    to{
-        opacity:0;
-        transform:translateY(-35px);
-    }
-}
-
-@media(max-width:700px){
-
-    #hud{
-        gap:5px;
-        padding:5px;
-    }
-
-    .hudBox{
-        min-width:65px;
-    }
-
-    .bar{
-        width:70px;
-    }
-
-    #log{
-        display:none;
-    }
-
-    #mobile{
-        display:block;
-    }
-
-    #interactButton{
-        display:block;
-    }
-
-    .screen h1{
-        font-size:40px;
-    }
+#controls{
+    position:fixed;
+    bottom:12px;
+    left:12px;
+    z-index:30;
+    color:#aaa;
+    font-size:13px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="game">
-
 <div id="hud">
 
-    <div class="hudBox">
-        <div class="label">Health</div>
-        <div class="bar">
-            <div id="hpBar"></div>
-        </div>
+    <div>
+        <b>⚔️ Dungeon Dash</b><br>
+        Floor <span id="floorNumber">1</span>
     </div>
 
-    <div class="hudBox">
-        <div class="label">Mana</div>
-        <div class="bar">
-            <div id="manaBar"></div>
-        </div>
+    <div class="stat">
+        <div class="label">HEALTH</div>
+        <div class="bar"><div id="hpBar"></div></div>
+        <span id="hpText">100 / 100</span>
     </div>
 
-    <div class="hudBox">
-        <div class="label">Level</div>
-        <div class="value" id="level">1</div>
+    <div class="stat">
+        <div class="label">MANA</div>
+        <div class="bar"><div id="manaBar"></div></div>
+        <span id="manaText">100 / 100</span>
     </div>
 
-    <div class="hudBox">
-        <div class="label">Gold</div>
-        <div class="value" id="gold">0</div>
-    </div>
-
-    <div class="hudBox">
-        <div class="label">Floor</div>
-        <div class="value" id="floorText">1</div>
-    </div>
-
-    <div class="hudBox">
-        <div class="label">Weapon</div>
-        <div class="value" id="weaponText">Rusty Sword</div>
-    </div>
+    <div>💰 <span id="gold">0</span></div>
+    <div>⭐ Lv.<span id="level">1</span></div>
+    <div>XP <span id="xp">0</span>/<span id="xpNeed">100</span></div>
+    <div>⚔️ <span id="damage">10</span></div>
 
 </div>
 
-
-<div id="world">
-
-    <div id="floorPattern"></div>
-
-    <div id="player">
-        <div class="playerHead"></div>
-        <div class="playerEye"></div>
-        <div class="playerBody"></div>
-    </div>
-
+<div id="game">
+    <div id="floor"></div>
+    <div id="player"></div>
 </div>
 
+<div id="interaction"></div>
 
-<div id="interaction">
-    E — Interact
-    <small id="interactionDetail"></small>
+<div id="questPanel">
+    <h3>📜 Active Quests</h3>
+    <div id="questList">No quests yet.</div>
 </div>
-
 
 <div id="log"></div>
 
-
-<div id="mobile">
-
-    <div>
-        <button class="mobileBtn" data-key="w">▲</button>
-    </div>
-
-    <div>
-        <button class="mobileBtn" data-key="a">◀</button>
-        <button class="mobileBtn" data-key="s">▼</button>
-        <button class="mobileBtn" data-key="d">▶</button>
-    </div>
-
+<div id="controls">
+    WASD / Arrows = Move &nbsp; | &nbsp;
+    SPACE = Attack &nbsp; | &nbsp;
+    Q = Magic &nbsp; | &nbsp;
+    R = Potion &nbsp; | &nbsp;
+    E = Interact
 </div>
 
-<button id="interactButton" onclick="interact()">
-    E — INTERACT
-</button>
-
-
-<!-- START -->
-
-<div class="screen" id="startScreen">
-
-    <h1>DUNGEON DASH</h1>
-
-    <p>
-        A procedurally generated roguelike dungeon.
-        Explore rooms, fight monsters, discover secrets,
-        collect equipment and survive as long as possible.
-    </p>
-
-    <p>
-        <b>WASD / ARROWS</b> — Move<br>
-        <b>SPACE</b> — Attack<br>
-        <b>Q</b> — Magic Attack<br>
-        <b>E</b> — Interact
-    </p>
-
-    <button onclick="startGame()">
-        ENTER THE DUNGEON
-    </button>
-
+<div id="dialog">
+    <div id="dialogName"></div>
+    <div id="dialogText"></div>
+    <button class="dialogButton" id="questButton">Accept Quest</button>
+    <button class="dialogButton" onclick="closeDialog()">Close</button>
 </div>
 
-
-<!-- GAME OVER -->
-
-<div class="screen" id="gameOver" style="display:none">
-
-    <h1>YOU DIED</h1>
-
-    <p id="deathStats"></p>
-
-    <button onclick="startGame()">
-        NEW RUN
-    </button>
-
+<div id="startScreen">
+    <div class="bigTitle">DUNGEON DASH</div>
+    <p>A randomized roguelike adventure.</p>
+    <p>Some floors contain NPCs with quests.</p>
+    <button class="startButton" onclick="startGame()">START RUN</button>
 </div>
 
+<div id="deathScreen">
+    <div class="bigTitle">YOU DIED</div>
+    <p>You reached floor <span id="deathFloor">1</span>.</p>
+    <button class="startButton" onclick="startGame()">NEW RUN</button>
 </div>
-
 
 <script>
 
-/* =====================================================
-   DUNGEON DASH ROGUELIKE
-===================================================== */
+/* =========================
+   GAME STATE
+========================= */
 
-const world = document.getElementById("world");
-const playerEl = document.getElementById("player");
-const interactionEl = document.getElementById("interaction");
-const interactionDetail = document.getElementById("interactionDetail");
+const game = document.getElementById("game");
+const floorElement = document.getElementById("floor");
+const player = document.getElementById("player");
 
 let running = false;
-let keys = {};
 
-let player = {
-    x: 400,
-    y: 300,
-    health:100,
-    maxHealth:100,
-    mana:50,
-    maxMana:50,
-    level:1,
-    xp:0,
-    gold:0,
-    damage:20,
-    weapon:"Rusty Sword",
-    potions:2
+let floorNumber = 1;
+
+let playerData = {
+    x: 300,
+    y: 200,
+    speed: 4,
+
+    maxHp: 100,
+    hp: 100,
+
+    maxMana: 100,
+    mana: 100,
+
+    gold: 0,
+
+    level: 1,
+    xp: 0,
+    xpNeed: 100,
+
+    damage: 10,
+
+    potions: 3
 };
 
-let floor = 1;
+let keys = {
+    w:false,
+    a:false,
+    s:false,
+    d:false
+};
 
-let objects = [];
 let enemies = [];
+let npcs = [];
+let objects = [];
+let walls = [];
 
-let currentInteraction = null;
+let activeQuests = [];
+
+let currentNPC = null;
 
 let attackCooldown = 0;
 let magicCooldown = 0;
 
-let enemyTimer;
+
+/* =========================
+   LOG
+========================= */
+
+function log(message){
+
+    const line = document.createElement("div");
+
+    line.className = "logline";
+
+    line.textContent = message;
+
+    document.getElementById("log").prepend(line);
+
+    const lines = document.querySelectorAll(".logline");
+
+    if(lines.length > 10){
+        lines[lines.length-1].remove();
+    }
+}
 
 
-/* =====================================================
-   START
-===================================================== */
+/* =========================
+   START GAME
+========================= */
 
 function startGame(){
 
-    document.getElementById("startScreen").style.display="none";
-    document.getElementById("gameOver").style.display="none";
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("deathScreen").style.display = "none";
 
-    floor=1;
+    running = true;
 
-    player={
-        x:400,
-        y:300,
-        health:100,
-        maxHealth:100,
-        mana:50,
-        maxMana:50,
+    floorNumber = 1;
+
+    playerData = {
+        x: game.clientWidth / 2 - 23,
+        y: game.clientHeight / 2 - 27,
+        speed:4,
+
+        maxHp:100,
+        hp:100,
+
+        maxMana:100,
+        mana:100,
+
+        gold:0,
+
         level:1,
         xp:0,
-        gold:0,
-        damage:20,
-        weapon:"Rusty Sword",
-        potions:2
+        xpNeed:100,
+
+        damage:10,
+
+        potions:3
     };
 
-    running=true;
+    activeQuests = [];
 
-    logClear();
+    generateFloor();
 
-    log("You enter a new dungeon.");
+    updateHUD();
 
-    generateDungeon();
+    log("Your dungeon run begins.");
 
-    updateUI();
-
+    requestAnimationFrame(gameLoop);
 }
 
 
-/* =====================================================
-   RANDOM HELPERS
-===================================================== */
+/* =========================
+   FLOOR GENERATION
+========================= */
 
-function rand(min,max){
-    return Math.floor(Math.random()*(max-min+1))+min;
-}
+function generateFloor(){
 
-function distance(a,b){
-    return Math.hypot(
-        a.x-b.x,
-        a.y-b.y
-    );
-}
+    enemies = [];
+    npcs = [];
+    objects = [];
+    walls = [];
 
+    document.querySelectorAll(".enemy").forEach(e => e.remove());
+    document.querySelectorAll(".npc").forEach(e => e.remove());
+    document.querySelectorAll(".chest").forEach(e => e.remove());
+    document.querySelectorAll(".item").forEach(e => e.remove());
+    document.querySelectorAll(".shrine").forEach(e => e.remove());
+    document.querySelectorAll(".wall").forEach(e => e.remove());
 
-/* =====================================================
-   CLEAR WORLD
-===================================================== */
+    playerData.x = game.clientWidth / 2 - 23;
+    playerData.y = game.clientHeight / 2 - 27;
 
-function clearWorld(){
+    createWalls();
 
-    world.querySelectorAll(
-        ".object,.enemy,.damage"
-    ).forEach(e=>e.remove());
+    createEnemies();
 
-    objects=[];
-    enemies=[];
+    createTreasures();
 
-}
+    createNPCs();
 
+    updatePlayer();
 
-/* =====================================================
-   GENERATE DUNGEON
-===================================================== */
+    updateQuestPanel();
 
-function generateDungeon(){
+    log("Entering floor " + floorNumber + ".");
 
-    clearWorld();
-
-    player.x=window.innerWidth/2;
-    player.y=window.innerHeight/2;
-
-    /*
-       More enemies on later floors.
-    */
-
-    const enemyCount=
-        Math.min(3+floor*2,14);
-
-    for(let i=0;i<enemyCount;i++){
-
-        spawnEnemy(
-            rand(100,window.innerWidth-160),
-            rand(100,window.innerHeight-180)
-        );
-    }
-
-    /*
-       Chests
-    */
-
-    const chestCount=rand(2,4);
-
-    for(let i=0;i<chestCount;i++){
-
-        spawnObject(
-            "chest",
-            rand(100,window.innerWidth-130),
-            rand(120,window.innerHeight-180)
-        );
-    }
-
-
-    /*
-       Statues
-    */
-
-    if(Math.random()<.8){
-
-        spawnObject(
-            "statue",
-            rand(100,window.innerWidth-130),
-            rand(120,window.innerHeight-180)
-        );
-    }
-
-
-    /*
-       Potion
-    */
-
-    if(Math.random()<.7){
-
-        spawnObject(
-            "potion",
-            rand(100,window.innerWidth-130),
-            rand(120,window.innerHeight-180)
-        );
-    }
-
-
-    /*
-       Weapon
-    */
-
-    if(Math.random()<.45){
-
-        spawnObject(
-            "weapon",
-            rand(100,window.innerWidth-130),
-            rand(120,window.innerHeight-180)
-        );
-    }
-
-
-    /*
-       Secret room
-    */
-
-    if(Math.random()<.35){
-
-        spawnObject(
-            "secret",
-            rand(100,window.innerWidth-130),
-            rand(120,window.innerHeight-180)
-        );
-    }
-
-
-    /*
-       Exit
-    */
-
-    spawnObject(
-        "door",
-        window.innerWidth-120,
-        window.innerHeight/2
-    );
-
-
-    /*
-       Boss every 5 floors
-    */
-
-    if(floor%5===0){
+    if(floorNumber % 5 === 0){
 
         spawnBoss();
 
-        log("A powerful presence fills the dungeon...");
+        log("⚠️ A powerful boss guards this floor!");
     }
-
-
-    updateUI();
 }
 
 
-/* =====================================================
-   OBJECT CREATION
-===================================================== */
+/* =========================
+   WALLS
+========================= */
 
-function spawnObject(type,x,y){
+function createWalls(){
 
-    const el=document.createElement("div");
+    for(let i=0;i<7;i++){
 
-    el.className=
-        "object "+type;
+        const wall = document.createElement("div");
 
-    el.style.left=x+"px";
-    el.style.top=y+"px";
+        wall.className = "wall";
 
-    world.appendChild(el);
+        const width = 80 + Math.random()*130;
+        const height = 30 + Math.random()*40;
 
-    const obj={
-        type,
-        x,
-        y,
-        el,
-        used:false
-    };
+        const x = Math.random() * (game.clientWidth-width);
+        const y = Math.random() * (game.clientHeight-height);
 
-    objects.push(obj);
+        wall.style.width = width+"px";
+        wall.style.height = height+"px";
+        wall.style.left = x+"px";
+        wall.style.top = y+"px";
 
+        floorElement.appendChild(wall);
+
+        walls.push({
+            x,
+            y,
+            width,
+            height
+        });
+    }
 }
 
 
-/* =====================================================
+/* =========================
    ENEMIES
-===================================================== */
+========================= */
 
-function spawnEnemy(x,y){
+function createEnemies(){
 
-    let types=[
-        "goblin",
-        "skeleton",
-        "orc",
-        "mage"
+    let count = 5 + Math.floor(floorNumber * 1.5);
+
+    for(let i=0;i<count;i++){
+
+        spawnEnemy();
+    }
+}
+
+function spawnEnemy(){
+
+    const types = [
+        {
+            type:"goblin",
+            icon:"👺",
+            hp:25,
+            damage:5
+        },
+        {
+            type:"skeleton",
+            icon:"💀",
+            hp:35,
+            damage:7
+        },
+        {
+            type:"orc",
+            icon:"👹",
+            hp:55,
+            damage:10
+        },
+        {
+            type:"mage",
+            icon:"🧙",
+            hp:40,
+            damage:12
+        }
     ];
 
-    const type=
-        types[rand(0,types.length-1)];
+    let base = types[Math.floor(Math.random()*types.length)];
 
-    const el=document.createElement("div");
+    const enemy = {
+        x:randomX(),
+        y:randomY(),
+        hp:base.hp + floorNumber*5,
+        maxHp:base.hp + floorNumber*5,
+        damage:base.damage + floorNumber,
+        type:base.type,
+        icon:base.icon,
+        speed:1 + Math.random()*.5
+    };
 
-    el.className=
-        "enemy "+type;
+    const el = document.createElement("div");
 
-    el.style.left=x+"px";
-    el.style.top=y+"px";
+    el.className = "enemy "+enemy.type;
 
-    const hp=
-        30+
-        floor*8+
-        rand(0,20);
+    el.textContent = enemy.icon;
 
-    el.innerHTML=`
-        <div class="enemyHP">
-            <div style="width:100%"></div>
-        </div>
-    `;
+    game.appendChild(el);
 
-    world.appendChild(el);
+    enemy.element = el;
 
-    enemies.push({
-        type,
-        x,
-        y,
-        hp,
-        maxHp:hp,
-        damage:5+floor*2,
-        el,
-        attackCooldown:0
-    });
+    enemies.push(enemy);
 }
 
 
-/* =====================================================
+/* =========================
    BOSS
-===================================================== */
+========================= */
 
 function spawnBoss(){
 
-    const el=document.createElement("div");
+    const boss = {
+        x:game.clientWidth/2,
+        y:100,
+        hp:300 + floorNumber*50,
+        maxHp:300 + floorNumber*50,
+        damage:18 + floorNumber,
+        type:"boss",
+        icon:"👑",
+        speed:.8
+    };
 
-    el.className="enemy boss";
+    const el = document.createElement("div");
 
-    el.style.left=
-        (window.innerWidth/2-50)+"px";
+    el.className = "enemy boss";
 
-    el.style.top="120px";
+    el.textContent = boss.icon;
 
-    const hp=
-        300+
-        floor*60;
+    game.appendChild(el);
 
-    el.innerHTML=`
-        <div class="enemyHP">
-            <div style="width:100%"></div>
-        </div>
-    `;
+    boss.element = el;
 
-    world.appendChild(el);
+    enemies.push(boss);
+}
 
-    enemies.push({
-        type:"Dungeon Lord",
-        x:window.innerWidth/2-50,
-        y:120,
-        hp,
-        maxHp:hp,
-        damage:15+floor*2,
-        el,
-        attackCooldown:0,
-        boss:true
+
+/* =========================
+   TREASURES
+========================= */
+
+function createTreasures(){
+
+    for(let i=0;i<3;i++){
+
+        const chest = document.createElement("div");
+
+        chest.className = "chest";
+
+        chest.textContent = "🧰";
+
+        const object = {
+            type:"chest",
+            x:randomX(),
+            y:randomY(),
+            opened:false,
+            element:chest
+        };
+
+        chest.style.left = object.x+"px";
+        chest.style.top = object.y+"px";
+
+        game.appendChild(chest);
+
+        objects.push(object);
+    }
+
+    if(Math.random() < .4){
+
+        const shrine = document.createElement("div");
+
+        shrine.className = "shrine";
+
+        shrine.textContent = "🔮";
+
+        const object = {
+            type:"shrine",
+            x:randomX(),
+            y:randomY(),
+            used:false,
+            element:shrine
+        };
+
+        shrine.style.left = object.x+"px";
+        shrine.style.top = object.y+"px";
+
+        game.appendChild(shrine);
+
+        objects.push(object);
+    }
+}
+
+
+/* =========================
+   NPC SYSTEM
+========================= */
+
+function createNPCs(){
+
+    /*
+       NPCs don't appear on every floor.
+       Higher floors have a greater chance.
+    */
+
+    const chance = floorNumber < 3 ? .35 : .7;
+
+    if(Math.random() > chance) return;
+
+    const npcCount = Math.random() < .2 ? 2 : 1;
+
+    for(let i=0;i<npcCount;i++){
+
+        const npcNames = [
+            ["Eldric","🧙"],
+            ["Mira","🧝"],
+            ["Borin","🧔"],
+            ["Luna","🧝‍♀️"],
+            ["Grim","💀"],
+            ["Pip","🧚"],
+            ["Ragnar","⚔️"]
+        ];
+
+        const chosen =
+            npcNames[Math.floor(Math.random()*npcNames.length)];
+
+        const npc = {
+            name:chosen[0],
+            icon:chosen[1],
+
+            x:randomX(),
+            y:randomY(),
+
+            quest:null
+        };
+
+        npc.quest = generateQuest();
+
+        const el = document.createElement("div");
+
+        el.className = "npc quest";
+
+        el.textContent = npc.icon;
+
+        const mark = document.createElement("div");
+
+        mark.className = "questMark";
+
+        mark.textContent = "!";
+
+        el.appendChild(mark);
+
+        el.style.left = npc.x+"px";
+        el.style.top = npc.y+"px";
+
+        game.appendChild(el);
+
+        npc.element = el;
+
+        npcs.push(npc);
+    }
+}
+
+
+/* =========================
+   QUEST GENERATOR
+========================= */
+
+function generateQuest(){
+
+    const roll = Math.random();
+
+    /*
+       SMALL QUEST
+    */
+
+    if(roll < .35){
+
+        const amount = 2 + Math.floor(Math.random()*3);
+
+        return {
+            id:crypto.randomUUID(),
+            type:"kill",
+            size:"Small",
+            title:"Goblin Trouble",
+            description:"Defeat "+amount+" enemies.",
+            target:amount,
+            progress:0,
+            rewardGold:30 + floorNumber*5,
+            rewardXP:40 + floorNumber*10,
+            completed:false
+        };
+    }
+
+    /*
+       MEDIUM QUEST
+    */
+
+    if(roll < .75){
+
+        const amount = 3 + Math.floor(Math.random()*3);
+
+        return {
+            id:crypto.randomUUID(),
+            type:"chest",
+            size:"Medium",
+            title:"Lost Treasure",
+            description:"Open "+amount+" treasure chests.",
+            target:amount,
+            progress:0,
+            rewardGold:100 + floorNumber*10,
+            rewardXP:100 + floorNumber*15,
+            completed:false
+        };
+    }
+
+    /*
+       BIG QUEST
+    */
+
+    if(roll < .93){
+
+        const amount = 8 + Math.floor(Math.random()*5);
+
+        return {
+            id:crypto.randomUUID(),
+            type:"kill",
+            size:"Big",
+            title:"Dungeon Exterminator",
+            description:"Defeat "+amount+" enemies.",
+            target:amount,
+            progress:0,
+            rewardGold:250 + floorNumber*25,
+            rewardXP:250 + floorNumber*30,
+            completed:false
+        };
+    }
+
+    /*
+       HUGE QUEST
+    */
+
+    return {
+        id:crypto.randomUUID(),
+        type:"boss",
+        size:"Huge",
+        title:"Slayer of Kings",
+        description:"Defeat the dungeon boss.",
+        target:1,
+        progress:0,
+        rewardGold:500 + floorNumber*50,
+        rewardXP:500 + floorNumber*50,
+        completed:false
+    };
+}
+
+
+/* =========================
+   NPC INTERACTION
+========================= */
+
+function talkToNPC(npc){
+
+    currentNPC = npc;
+
+    document.getElementById("dialog").style.display = "block";
+
+    document.getElementById("dialogName").textContent =
+        npc.name;
+
+    const quest = npc.quest;
+
+    if(hasQuest(quest.id)){
+
+        if(quest.completed){
+
+            document.getElementById("dialogText").textContent =
+                "You completed my quest! Thank you, hero.";
+
+            document.getElementById("questButton").textContent =
+                "Claim Reward";
+
+            document.getElementById("questButton").onclick =
+                () => completeQuest(quest);
+
+        }else{
+
+            document.getElementById("dialogText").textContent =
+                "You're still working on my quest: "+quest.description;
+
+            document.getElementById("questButton").style.display =
+                "none";
+        }
+
+    }else{
+
+        document.getElementById("dialogText").innerHTML =
+            "I need your help!<br><br>"+
+            "<b>"+quest.size+" Quest:</b> "+quest.title+
+            "<br>"+quest.description+
+            "<br><br>Reward: 💰 "+quest.rewardGold+
+            " + ⭐ "+quest.rewardXP;
+
+        document.getElementById("questButton").style.display =
+            "inline-block";
+
+        document.getElementById("questButton").textContent =
+            "Accept Quest";
+
+        document.getElementById("questButton").onclick =
+            () => acceptQuest(quest);
+    }
+}
+
+
+function acceptQuest(quest){
+
+    activeQuests.push(quest);
+
+    log("📜 Quest accepted: "+quest.title);
+
+    updateQuestPanel();
+
+    closeDialog();
+}
+
+
+function hasQuest(id){
+
+    return activeQuests.some(q => q.id === id);
+}
+
+
+function completeQuest(quest){
+
+    if(!quest.completed) return;
+
+    playerData.gold += quest.rewardGold;
+
+    gainXP(quest.rewardXP);
+
+    log(
+        "🎉 Quest complete! +" +
+        quest.rewardGold +
+        " gold and +" +
+        quest.rewardXP +
+        " XP."
+    );
+
+    activeQuests =
+        activeQuests.filter(q => q.id !== quest.id);
+
+    closeDialog();
+
+    updateHUD();
+
+    updateQuestPanel();
+}
+
+
+function closeDialog(){
+
+    document.getElementById("dialog").style.display = "none";
+
+    currentNPC = null;
+}
+
+
+/* =========================
+   QUEST PROGRESS
+========================= */
+
+function updateQuest(type){
+
+    activeQuests.forEach(q => {
+
+        if(q.completed) return;
+
+        if(q.type === type){
+
+            q.progress++;
+
+            if(q.progress >= q.target){
+
+                q.progress = q.target;
+
+                q.completed = true;
+
+                log("⭐ Quest completed: "+q.title);
+            }
+        }
+    });
+
+    updateQuestPanel();
+}
+
+
+function updateQuestPanel(){
+
+    const panel =
+        document.getElementById("questPanel");
+
+    const list =
+        document.getElementById("questList");
+
+    if(activeQuests.length === 0){
+
+        panel.style.display = "none";
+
+        return;
+    }
+
+    panel.style.display = "block";
+
+    list.innerHTML = "";
+
+    activeQuests.forEach(q => {
+
+        const div = document.createElement("div");
+
+        div.style.marginBottom = "12px";
+
+        div.innerHTML =
+            `<div class="questTitle">
+                ${q.size}: ${q.title}
+            </div>
+            <div>${q.description}</div>
+            <div class="questProgress">
+                ${q.progress}/${q.target}
+                ${q.completed ? " ✅ COMPLETE" : ""}
+            </div>
+            <div class="questReward">
+                💰 ${q.rewardGold} | ⭐ ${q.rewardXP} XP
+            </div>`;
+
+        list.appendChild(div);
     });
 }
 
 
-/* =====================================================
+/* =========================
    MOVEMENT
-===================================================== */
+========================= */
 
 function movePlayer(){
 
     if(!running) return;
 
-    let dx=0;
-    let dy=0;
+    let dx = 0;
+    let dy = 0;
 
-    if(keys.w || keys.ArrowUp) dy-=1;
-    if(keys.s || keys.ArrowDown) dy+=1;
-    if(keys.a || keys.ArrowLeft) dx-=1;
-    if(keys.d || keys.ArrowRight) dx+=1;
-
-    if(dx||dy){
-
-        const length=
-            Math.hypot(dx,dy);
-
-        dx/=length;
-        dy/=length;
-
-        const speed=4;
-
-        player.x+=dx*speed;
-        player.y+=dy*speed;
-
-    }
+    if(keys.w) dy -= 1;
+    if(keys.s) dy += 1;
+    if(keys.a) dx -= 1;
+    if(keys.d) dx += 1;
 
     /*
-       Keep player inside world.
+       Normalize diagonal movement
+       so diagonal isn't faster.
     */
 
-    player.x=Math.max(
-        25,
-        Math.min(
-            window.innerWidth-75,
-            player.x
-        )
-    );
+    if(dx !== 0 || dy !== 0){
 
-    player.y=Math.max(
-        90,
-        Math.min(
-            window.innerHeight-100,
-            player.y
-        )
-    );
+        const length =
+            Math.sqrt(dx*dx + dy*dy);
 
-    playerEl.style.left=
-        player.x+"px";
+        dx /= length;
+        dy /= length;
+    }
 
-    playerEl.style.top=
-        player.y+"px";
+    const oldX = playerData.x;
+    const oldY = playerData.y;
 
+    playerData.x += dx * playerData.speed;
+    playerData.y += dy * playerData.speed;
+
+    const maxX = game.clientWidth - 46;
+    const maxY = game.clientHeight - 54;
+
+    playerData.x =
+        Math.max(0,Math.min(maxX,playerData.x));
+
+    playerData.y =
+        Math.max(0,Math.min(maxY,playerData.y));
+
+    /*
+       Simple wall collision.
+    */
+
+    if(collidesWithWall()){
+
+        playerData.x = oldX;
+        playerData.y = oldY;
+    }
+
+    updatePlayer();
 }
 
 
-/* =====================================================
-   KEYBOARD
-===================================================== */
+function updatePlayer(){
 
-document.addEventListener("keydown",e=>{
+    player.style.left =
+        playerData.x+"px";
 
-    keys[e.key]=true;
+    player.style.top =
+        playerData.y+"px";
+}
 
-    if(e.key.toLowerCase()==="e"){
-        interact();
+
+function collidesWithWall(){
+
+    const px = playerData.x;
+    const py = playerData.y;
+
+    const pw = 46;
+    const ph = 54;
+
+    return walls.some(w => {
+
+        return (
+            px < w.x+w.width &&
+            px+pw > w.x &&
+            py < w.y+w.height &&
+            py+ph > w.y
+        );
+    });
+}
+
+
+/* =========================
+   ENEMY AI
+========================= */
+
+function updateEnemies(){
+
+    enemies.forEach(enemy => {
+
+        if(enemy.hp <= 0) return;
+
+        const dx =
+            playerData.x-enemy.x;
+
+        const dy =
+            playerData.y-enemy.y;
+
+        const distance =
+            Math.sqrt(dx*dx+dy*dy);
+
+        if(distance < 350){
+
+            if(distance > 48){
+
+                enemy.x +=
+                    (dx/distance)*enemy.speed;
+
+                enemy.y +=
+                    (dy/distance)*enemy.speed;
+            }
+
+            if(distance < 60){
+
+                playerData.hp -=
+                    enemy.damage * .01;
+            }
+        }
+
+        enemy.element.style.left =
+            enemy.x+"px";
+
+        enemy.element.style.top =
+            enemy.y+"px";
+    });
+
+    if(playerData.hp <= 0){
+
+        die();
     }
 
-    if(e.code==="Space"){
-        e.preventDefault();
-        attack();
-    }
-
-    if(e.key.toLowerCase()==="q"){
-        magicAttack();
-    }
-
-    if(e.key.toLowerCase()==="r"){
-        usePotion();
-    }
-
-});
+    updateHUD();
+}
 
 
-document.addEventListener("keyup",e=>{
-    keys[e.key]=false;
-});
-
-
-/* =====================================================
+/* =========================
    ATTACK
-===================================================== */
+========================= */
 
 function attack(){
 
     if(!running) return;
 
-    if(attackCooldown>0) return;
+    if(attackCooldown > 0) return;
 
-    attackCooldown=25;
+    attackCooldown = 20;
 
-    let target=null;
-    let best=130;
+    enemies.forEach(enemy => {
 
-    for(const enemy of enemies){
+        if(enemy.hp <= 0) return;
 
-        const d=
-            Math.hypot(
-                player.x-enemy.x,
-                player.y-enemy.y
+        const dx =
+            playerData.x-enemy.x;
+
+        const dy =
+            playerData.y-enemy.y;
+
+        const distance =
+            Math.sqrt(dx*dx+dy*dy);
+
+        if(distance < 85){
+
+            enemy.hp -= playerData.damage;
+
+            log(
+                "⚔️ Hit "+enemy.type+
+                " for "+playerData.damage+
+                " damage."
             );
 
-        if(d<best){
+            if(enemy.hp <= 0){
 
-            best=d;
-            target=enemy;
+                killEnemy(enemy);
+            }
         }
-    }
-
-    if(!target){
-
-        log("You swing at empty air.");
-
-        return;
-    }
-
-    damageEnemy(
-        target,
-        player.damage
-    );
+    });
 }
 
 
-/* =====================================================
+function killEnemy(enemy){
+
+    enemy.element.remove();
+
+    playerData.gold +=
+        5 + floorNumber;
+
+    gainXP(
+        20 + floorNumber*3
+    );
+
+    updateQuest("kill");
+
+    if(enemy.type === "boss"){
+
+        updateQuest("boss");
+
+        log("👑 BOSS DEFEATED!");
+
+        playerData.gold += 250;
+    }
+}
+
+
+/* =========================
    MAGIC
-===================================================== */
+========================= */
 
 function magicAttack(){
 
     if(!running) return;
 
-    if(magicCooldown>0) return;
+    if(magicCooldown > 0) return;
 
-    if(player.mana<15){
+    if(playerData.mana < 20){
 
         log("Not enough mana.");
 
         return;
     }
 
-    player.mana-=15;
+    playerData.mana -= 20;
 
-    magicCooldown=60;
+    magicCooldown = 40;
 
-    let target=null;
-    let best=260;
+    enemies.forEach(enemy => {
 
-    for(const enemy of enemies){
+        if(enemy.hp <= 0) return;
 
-        const d=
-            Math.hypot(
-                player.x-enemy.x,
-                player.y-enemy.y
-            );
+        const dx =
+            playerData.x-enemy.x;
 
-        if(d<best){
+        const dy =
+            playerData.y-enemy.y;
 
-            best=d;
-            target=enemy;
+        const distance =
+            Math.sqrt(dx*dx+dy*dy);
+
+        if(distance < 180){
+
+            enemy.hp -=
+                playerData.damage*2;
+
+            if(enemy.hp <= 0){
+
+                killEnemy(enemy);
+            }
         }
-    }
+    });
 
-    if(target){
+    log("✨ Arcane blast!");
 
-        damageEnemy(
-            target,
-            player.damage+25
-        );
-
-        log("Arcane magic strikes the enemy.");
-
-    }else{
-
-        log("Your spell hits nothing.");
-
-    }
-
-    updateUI();
+    updateHUD();
 }
 
 
-/* =====================================================
-   DAMAGE ENEMY
-===================================================== */
-
-function damageEnemy(enemy,amount){
-
-    enemy.hp-=amount;
-
-    showDamage(
-        enemy.x,
-        enemy.y,
-        amount
-    );
-
-    const hpBar=
-        enemy.el.querySelector(".enemyHP div");
-
-    hpBar.style.width=
-        Math.max(
-            0,
-            enemy.hp/enemy.maxHp*100
-        )+"%";
-
-    if(enemy.hp<=0){
-
-        killEnemy(enemy);
-
-    }
-
-}
-
-
-/* =====================================================
-   KILL ENEMY
-===================================================== */
-
-function killEnemy(enemy){
-
-    enemy.el.remove();
-
-    enemies=
-        enemies.filter(e=>e!==enemy);
-
-    const reward=
-        enemy.boss
-        ? 200
-        : rand(10,35);
-
-    player.gold+=reward;
-
-    const xp=
-        enemy.boss
-        ? 150
-        : 25;
-
-    gainXP(xp);
-
-    log(
-        `${enemy.type} defeated. +${reward} gold.`
-    );
-
-}
-
-
-/* =====================================================
-   XP
-===================================================== */
-
-function gainXP(amount){
-
-    player.xp+=amount;
-
-    const needed=
-        player.level*100;
-
-    if(player.xp>=needed){
-
-        player.xp-=needed;
-
-        player.level++;
-
-        player.maxHealth+=15;
-
-        player.health=
-            player.maxHealth;
-
-        player.maxMana+=10;
-
-        player.mana=
-            player.maxMana;
-
-        player.damage+=5;
-
-        log(
-            "LEVEL UP! Your power increases."
-        );
-
-    }
-
-    updateUI();
-}
-
-
-/* =====================================================
-   INTERACTION SYSTEM
-===================================================== */
-
-function findInteraction(){
-
-    let nearest=null;
-    let nearestDistance=90;
-
-    for(const obj of objects){
-
-        if(obj.used) continue;
-
-        const d=
-            Math.hypot(
-                player.x-obj.x,
-                player.y-obj.y
-            );
-
-        if(d<nearestDistance){
-
-            nearest=obj;
-            nearestDistance=d;
-        }
-
-    }
-
-    return nearest;
-}
-
-
-/* =====================================================
-   INTERACTION PROMPT
-===================================================== */
-
-function updateInteraction(){
-
-    const obj=
-        findInteraction();
-
-    currentInteraction=obj;
-
-    if(!obj){
-
-        interactionEl.style.display="none";
-
-        return;
-    }
-
-    interactionEl.style.display="block";
-
-    let action="Interact";
-
-    let detail="";
-
-    switch(obj.type){
-
-        case "chest":
-            action="Open Chest";
-            detail="Search for treasure";
-            break;
-
-        case "statue":
-            action="Inspect Statue";
-            detail="Something ancient is carved into it";
-            break;
-
-        case "potion":
-            action="Pick Up Potion";
-            detail="Restores health";
-            break;
-
-        case "weapon":
-            action="Pick Up Weapon";
-            detail="A stronger weapon";
-            break;
-
-        case "secret":
-            action="Inspect Wall";
-            detail="Something feels strange here";
-            break;
-
-        case "door":
-            action=
-                enemies.length===0
-                ? "Enter Next Floor"
-                : "Locked";
-
-            detail=
-                enemies.length===0
-                ? "E to continue"
-                : "Defeat all enemies first";
-
-            break;
-
-    }
-
-    interactionEl.innerHTML=
-        `E — ${action}<small>${detail}</small>`;
-
-}
-
-
-/* =====================================================
-   INTERACT
-===================================================== */
-
-function interact(){
-
-    if(!running) return;
-
-    const obj=
-        findInteraction();
-
-    if(!obj){
-
-        log("There is nothing nearby to interact with.");
-
-        return;
-    }
-
-    switch(obj.type){
-
-        case "chest":
-            openChest(obj);
-            break;
-
-        case "statue":
-            inspectStatue(obj);
-            break;
-
-        case "potion":
-            pickupPotion(obj);
-            break;
-
-        case "weapon":
-            pickupWeapon(obj);
-            break;
-
-        case "secret":
-            inspectSecret(obj);
-            break;
-
-        case "door":
-            useDoor(obj);
-            break;
-
-    }
-
-}
-
-
-/* =====================================================
-   CHEST
-===================================================== */
-
-function openChest(obj){
-
-    obj.used=true;
-
-    const rewards=[
-        "gold",
-        "potion",
-        "health",
-        "weapon"
-    ];
-
-    const reward=
-        rewards[rand(0,rewards.length-1)];
-
-    if(reward==="gold"){
-
-        const amount=
-            rand(30,90);
-
-        player.gold+=amount;
-
-        log(
-            `Chest opened! You found ${amount} gold.`
-        );
-
-    }
-
-    if(reward==="potion"){
-
-        player.potions++;
-
-        log(
-            "Chest opened! You found a potion."
-        );
-
-    }
-
-    if(reward==="health"){
-
-        const heal=35;
-
-        player.health=
-            Math.min(
-                player.maxHealth,
-                player.health+heal
-            );
-
-        log(
-            "The chest contained healing magic."
-        );
-
-    }
-
-    if(reward==="weapon"){
-
-        const newDamage=
-            player.damage+rand(5,12);
-
-        player.damage=
-            newDamage;
-
-        player.weapon=
-            "Enchanted Blade";
-
-        log(
-            "You found an Enchanted Blade!"
-        );
-
-    }
-
-    obj.el.remove();
-
-    updateUI();
-}
-
-
-/* =====================================================
-   STATUE
-===================================================== */
-
-function inspectStatue(obj){
-
-    obj.used=true;
-
-    const messages=[
-        "The statue whispers: 'Only the brave reach the deepest floor.'",
-        "Ancient runes describe a hidden treasure.",
-        "You feel watched by something in the darkness.",
-        "The statue's eyes briefly glow."
-    ];
-
-    log(
-        messages[
-            rand(0,messages.length-1)
-        ]
-    );
-
-    obj.el.style.opacity=".3";
-}
-
-
-/* =====================================================
+/* =========================
    POTION
-===================================================== */
-
-function pickupPotion(obj){
-
-    obj.used=true;
-
-    player.potions++;
-
-    obj.el.remove();
-
-    log(
-        "You picked up a health potion."
-    );
-
-    updateUI();
-}
-
-
-/* =====================================================
-   WEAPON
-===================================================== */
-
-function pickupWeapon(obj){
-
-    obj.used=true;
-
-    const bonus=
-        rand(8,18);
-
-    player.damage+=bonus;
-
-    player.weapon=
-        "Dungeon Blade";
-
-    obj.el.remove();
-
-    log(
-        `You equipped a Dungeon Blade. +${bonus} damage.`
-    );
-
-    updateUI();
-}
-
-
-/* =====================================================
-   SECRET
-===================================================== */
-
-function inspectSecret(obj){
-
-    obj.used=true;
-
-    const chance=Math.random();
-
-    if(chance<.6){
-
-        const gold=
-            rand(75,180);
-
-        player.gold+=gold;
-
-        log(
-            `SECRET ROOM! You discovered ${gold} gold.`
-        );
-
-    }else{
-
-        player.maxHealth+=20;
-
-        player.health=
-            player.maxHealth;
-
-        log(
-            "SECRET ROOM! A magical shrine increased your maximum health."
-        );
-
-    }
-
-    obj.el.remove();
-
-    updateUI();
-}
-
-
-/* =====================================================
-   DOOR
-===================================================== */
-
-function useDoor(obj){
-
-    if(enemies.length>0){
-
-        log(
-            "The door is magically sealed. Defeat every enemy."
-        );
-
-        return;
-    }
-
-    floor++;
-
-    log(
-        `You descend to floor ${floor}.`
-    );
-
-    generateDungeon();
-
-    updateUI();
-}
-
-
-/* =====================================================
-   POTION USE
-===================================================== */
+========================= */
 
 function usePotion(){
 
-    if(player.potions<=0){
+    if(playerData.potions <= 0){
 
-        log("You have no potions.");
-
-        return;
-    }
-
-    if(player.health>=player.maxHealth){
-
-        log("Your health is already full.");
+        log("No potions left.");
 
         return;
     }
 
-    player.potions--;
+    if(playerData.hp >= playerData.maxHp){
 
-    player.health=
+        return;
+    }
+
+    playerData.potions--;
+
+    playerData.hp =
         Math.min(
-            player.maxHealth,
-            player.health+45
+            playerData.maxHp,
+            playerData.hp+40
         );
 
-    log(
-        "You drank a health potion."
-    );
+    log("🧪 You used a potion.");
 
-    updateUI();
+    updateHUD();
 }
 
 
-/* =====================================================
-   ENEMY AI
-===================================================== */
+/* =========================
+   INTERACTION
+========================= */
 
-function updateEnemies(){
+function updateInteraction(){
 
-    if(!running) return;
+    let closest = null;
+    let closestDistance = Infinity;
 
-    for(const enemy of enemies){
+    /*
+       NPCs
+    */
 
-        const dx=
-            player.x-enemy.x;
+    npcs.forEach(npc => {
 
-        const dy=
-            player.y-enemy.y;
+        const distance =
+            getDistance(
+                playerData.x,
+                playerData.y,
+                npc.x,
+                npc.y
+            );
 
-        const d=
-            Math.hypot(dx,dy);
+        if(distance < closestDistance){
 
-        if(d>55){
+            closestDistance = distance;
 
-            const speed=
-                enemy.boss
-                ? 1.1
-                : .65;
+            closest = {
+                type:"npc",
+                object:npc
+            };
+        }
+    });
 
-            enemy.x+=
-                dx/d*speed;
+    /*
+       Objects
+    */
 
-            enemy.y+=
-                dy/d*speed;
+    objects.forEach(object => {
 
-            enemy.el.style.left=
-                enemy.x+"px";
+        if(object.type === "chest" && object.opened)
+            return;
 
-            enemy.el.style.top=
-                enemy.y+"px";
+        if(object.type === "shrine" && object.used)
+            return;
 
-        }else{
+        const distance =
+            getDistance(
+                playerData.x,
+                playerData.y,
+                object.x,
+                object.y
+            );
 
-            if(enemy.attackCooldown<=0){
+        if(distance < closestDistance){
 
-                player.health-=enemy.damage;
+            closestDistance = distance;
 
-                enemy.attackCooldown=
-                    enemy.boss
-                    ? 50
-                    : 75;
+            closest = {
+                type:object.type,
+                object
+            };
+        }
+    });
 
-                showDamage(
-                    player.x,
-                    player.y,
-                    enemy.damage
-                );
+    const interaction =
+        document.getElementById("interaction");
 
-                updateUI();
+    if(closest && closestDistance < 85){
 
-                if(player.health<=0){
+        interaction.style.display = "block";
 
-                    die();
+        if(closest.type === "npc"){
 
-                }
-
-            }
-
+            interaction.textContent =
+                "E — Talk to "+closest.object.name;
         }
 
-        if(enemy.attackCooldown>0){
-            enemy.attackCooldown--;
+        if(closest.type === "chest"){
+
+            interaction.textContent =
+                "E — Open Chest";
         }
 
+        if(closest.type === "shrine"){
+
+            interaction.textContent =
+                "E — Use Shrine";
+        }
+
+        window.nearbyInteraction = closest;
+
+    }else{
+
+        interaction.style.display = "none";
+
+        window.nearbyInteraction = null;
+    }
+}
+
+
+/* =========================
+   INTERACT
+========================= */
+
+function interact(){
+
+    if(!window.nearbyInteraction){
+
+        log("There is nothing nearby.");
+
+        return;
     }
 
+    const target =
+        window.nearbyInteraction;
+
+    if(target.type === "npc"){
+
+        talkToNPC(target.object);
+
+        return;
+    }
+
+    if(target.type === "chest"){
+
+        openChest(target.object);
+
+        return;
+    }
+
+    if(target.type === "shrine"){
+
+        useShrine(target.object);
+
+        return;
+    }
 }
 
 
-/* =====================================================
+/* =========================
+   CHEST
+========================= */
+
+function openChest(chest){
+
+    if(chest.opened) return;
+
+    chest.opened = true;
+
+    chest.element.textContent = "📦";
+
+    const gold =
+        20 + Math.floor(Math.random()*60);
+
+    playerData.gold += gold;
+
+    log("🧰 Chest opened! +"+gold+" gold.");
+
+    updateQuest("chest");
+
+    if(Math.random() < .3){
+
+        playerData.potions++;
+
+        log("🧪 You found a potion!");
+    }
+
+    updateHUD();
+}
+
+
+/* =========================
+   SHRINE
+========================= */
+
+function useShrine(shrine){
+
+    if(shrine.used) return;
+
+    shrine.used = true;
+
+    shrine.element.textContent = "✨";
+
+    playerData.hp =
+        playerData.maxHp;
+
+    playerData.mana =
+        playerData.maxMana;
+
+    log("🔮 The shrine restores you completely.");
+
+    updateHUD();
+}
+
+
+/* =========================
+   XP
+========================= */
+
+function gainXP(amount){
+
+    playerData.xp += amount;
+
+    while(playerData.xp >= playerData.xpNeed){
+
+        playerData.xp -= playerData.xpNeed;
+
+        playerData.level++;
+
+        playerData.xpNeed =
+            Math.floor(playerData.xpNeed*1.35);
+
+        playerData.maxHp += 15;
+
+        playerData.maxMana += 10;
+
+        playerData.damage += 3;
+
+        playerData.hp =
+            playerData.maxHp;
+
+        playerData.mana =
+            playerData.maxMana;
+
+        log(
+            "⭐ LEVEL UP! You are now level "+
+            playerData.level+"!"
+        );
+    }
+
+    updateHUD();
+}
+
+
+/* =========================
+   FLOOR EXIT
+========================= */
+
+function checkFloorClear(){
+
+    const alive =
+        enemies.filter(e => e.hp > 0);
+
+    /*
+       Once all enemies are dead,
+       automatically allow the player
+       to progress by reaching the edge.
+    */
+
+    if(alive.length === 0){
+
+        if(
+            playerData.x >
+            game.clientWidth-80
+        ){
+
+            floorNumber++;
+
+            playerData.hp =
+                Math.min(
+                    playerData.maxHp,
+                    playerData.hp+20
+                );
+
+            playerData.mana =
+                playerData.maxMana;
+
+            generateFloor();
+
+            updateHUD();
+        }
+    }
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+function updateHUD(){
+
+    document.getElementById("floorNumber").textContent =
+        floorNumber;
+
+    document.getElementById("hpText").textContent =
+        Math.ceil(playerData.hp)+" / "+playerData.maxHp;
+
+    document.getElementById("manaText").textContent =
+        Math.ceil(playerData.mana)+" / "+playerData.maxMana;
+
+    document.getElementById("hpBar").style.width =
+        Math.max(0,
+        playerData.hp/playerData.maxHp*100)+"%";
+
+    document.getElementById("manaBar").style.width =
+        Math.max(0,
+        playerData.mana/playerData.maxMana*100)+"%";
+
+    document.getElementById("gold").textContent =
+        playerData.gold;
+
+    document.getElementById("level").textContent =
+        playerData.level;
+
+    document.getElementById("xp").textContent =
+        playerData.xp;
+
+    document.getElementById("xpNeed").textContent =
+        playerData.xpNeed;
+
+    document.getElementById("damage").textContent =
+        playerData.damage;
+}
+
+
+/* =========================
    GAME LOOP
-===================================================== */
+========================= */
 
 function gameLoop(){
 
-    if(!running) return;
+    if(running){
 
-    movePlayer();
+        movePlayer();
 
-    updateEnemies();
+        updateEnemies();
 
-    if(attackCooldown>0)
-        attackCooldown--;
+        updateInteraction();
 
-    if(magicCooldown>0)
-        magicCooldown--;
+        checkFloorClear();
 
-    updateInteraction();
+        if(attackCooldown > 0)
+            attackCooldown--;
+
+        if(magicCooldown > 0)
+            magicCooldown--;
+
+    }
+
+    /*
+       IMPORTANT:
+       The animation frame continues even
+       when the game isn't running.
+       This fixes the old movement bug.
+    */
 
     requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
 
+/* =========================
+   KEYBOARD
+========================= */
 
-/* =====================================================
-   DAMAGE TEXT
-===================================================== */
+document.addEventListener("keydown",e => {
 
-function showDamage(x,y,amount){
+    const key =
+        e.key.toLowerCase();
 
-    const el=
-        document.createElement("div");
-
-    el.className="damage";
-
-    el.textContent=
-        "-"+amount;
-
-    el.style.left=x+"px";
-    el.style.top=y+"px";
-
-    world.appendChild(el);
-
-    setTimeout(()=>{
-        el.remove();
-    },700);
-
-}
-
-
-/* =====================================================
-   UI
-===================================================== */
-
-function updateUI(){
-
-    document.getElementById("hpBar")
-        .style.width=
-        Math.max(
-            0,
-            player.health/player.maxHealth*100
-        )+"%";
-
-    document.getElementById("manaBar")
-        .style.width=
-        Math.max(
-            0,
-            player.mana/player.maxMana*100
-        )+"%";
-
-    document.getElementById("level")
-        .textContent=
-        player.level;
-
-    document.getElementById("gold")
-        .textContent=
-        player.gold;
-
-    document.getElementById("floorText")
-        .textContent=
-        floor;
-
-    document.getElementById("weaponText")
-        .textContent=
-        player.weapon;
-
-}
-
-
-/* =====================================================
-   LOG
-===================================================== */
-
-function log(text){
-
-    const line=
-        document.createElement("div");
-
-    line.className="logLine";
-
-    line.textContent=
-        "› "+text;
-
-    const logEl=
-        document.getElementById("log");
-
-    logEl.prepend(line);
-
-    while(logEl.children.length>8){
-
-        logEl.lastChild.remove();
-
+    if(
+        key === "w" ||
+        key === "arrowup"
+    ){
+        keys.w = true;
+        e.preventDefault();
     }
 
-}
+    if(
+        key === "s" ||
+        key === "arrowdown"
+    ){
+        keys.s = true;
+        e.preventDefault();
+    }
 
-function logClear(){
+    if(
+        key === "a" ||
+        key === "arrowleft"
+    ){
+        keys.a = true;
+        e.preventDefault();
+    }
 
-    document.getElementById("log")
-        .innerHTML="";
+    if(
+        key === "d" ||
+        key === "arrowright"
+    ){
+        keys.d = true;
+        e.preventDefault();
+    }
 
-}
+    if(key === "e"){
+
+        interact();
+    }
+
+    if(e.code === "Space"){
+
+        e.preventDefault();
+
+        attack();
+    }
+
+    if(key === "q"){
+
+        magicAttack();
+    }
+
+    if(key === "r"){
+
+        usePotion();
+    }
+});
 
 
-/* =====================================================
+document.addEventListener("keyup",e => {
+
+    const key =
+        e.key.toLowerCase();
+
+    if(
+        key === "w" ||
+        key === "arrowup"
+    )
+        keys.w = false;
+
+    if(
+        key === "s" ||
+        key === "arrowdown"
+    )
+        keys.s = false;
+
+    if(
+        key === "a" ||
+        key === "arrowleft"
+    )
+        keys.a = false;
+
+    if(
+        key === "d" ||
+        key === "arrowright"
+    )
+        keys.d = false;
+});
+
+
+/* =========================
    DEATH
-===================================================== */
+========================= */
 
 function die(){
 
-    running=false;
+    running = false;
 
-    document.getElementById("deathStats")
-        .textContent=
-        `You reached floor ${floor}, level ${player.level}, and collected ${player.gold} gold.`;
+    document.getElementById("deathFloor").textContent =
+        floorNumber;
 
-    document.getElementById("gameOver")
-        .style.display="flex";
+    document.getElementById("deathScreen").style.display =
+        "flex";
 
+    log("💀 Your run has ended.");
 }
 
 
-/* =====================================================
-   MOBILE CONTROLS
-===================================================== */
+/* =========================
+   UTILITIES
+========================= */
 
-document.querySelectorAll(".mobileBtn")
-.forEach(button=>{
+function randomX(){
 
-    const key=
-        button.dataset.key;
-
-    button.addEventListener(
-        "touchstart",
-        e=>{
-            e.preventDefault();
-            keys[key]=true;
-        }
-    );
-
-    button.addEventListener(
-        "touchend",
-        e=>{
-            e.preventDefault();
-            keys[key]=false;
-        }
-    );
-
-});
+    return 80 +
+        Math.random() *
+        Math.max(100,game.clientWidth-160);
+}
 
 
-/* =====================================================
-   RESIZE
-===================================================== */
+function randomY(){
 
-window.addEventListener("resize",()=>{
+    return 90 +
+        Math.random() *
+        Math.max(100,game.clientHeight-180);
+}
 
-    player.x=
-        Math.min(
-            player.x,
-            window.innerWidth-75
-        );
 
-    player.y=
-        Math.min(
-            player.y,
-            window.innerHeight-100
-        );
+function getDistance(x1,y1,x2,y2){
 
-});
+    const dx = x1-x2;
+    const dy = y1-y2;
+
+    return Math.sqrt(dx*dx+dy*dy);
+}
+
+
+/* Start the animation loop immediately */
+
+requestAnimationFrame(gameLoop);
 
 </script>
 
