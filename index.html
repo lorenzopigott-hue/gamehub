@@ -1,114 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Dino Frontier 3D</title>
-  <link rel="stylesheet" href="dino.css">
-  <script>if(!location.search.includes("test=1")){const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js";s.async=true;document.head.appendChild(s)}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameHub — Free Browser Games</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="game"></canvas>
+  <header class="topbar">
+    <a class="logo" href="index.html">🎮 <span>GameHub</span></a>
+    <nav>
+      <a href="#games">Games</a>
+      <a href="#categories">Categories</a>
+      <button id="themeBtn" class="icon-btn" title="Toggle theme">🌙</button>
+    </nav>
+  </header>
 
-  <section id="start" class="screen active">
-    <div class="hero-glow"></div>
-    <div class="hero">
-      <div class="eyebrow">GAMEHUB • 3D PREHISTORIC SURVIVAL</div>
-      <h1>DINO <span>FRONTIER</span></h1>
-      <p class="tagline">Build a home. Grow a prehistoric farm. Earn a dinosaur's trust. Explore a living lost world with your friends.</p>
-      <div class="panel intro-panel">
-        <label class="field-label">Explorer name</label>
-        <input id="name" maxlength="16" value="Explorer" autocomplete="off">
-        <div class="row actions">
-          <button id="hostBtn" class="primary">HOST WORLD</button>
-          <button id="soloBtn">PLAY SOLO</button>
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">BROWSER GAME PORTAL</p>
+        <h1>Play something awesome.</h1>
+        <p class="hero-text">A clean starter game site for your own games and games you are allowed to distribute.</p>
+        <div class="search-wrap">
+          <span>🔎</span>
+          <input id="searchInput" type="search" placeholder="Search games..." autocomplete="off">
         </div>
-        <div class="join-row">
-          <input id="room" maxlength="24" placeholder="Paste host room code">
-          <button id="joinBtn">JOIN</button>
+      </div>
+      <div class="hero-card">
+        <div class="hero-controller">🕹️</div>
+        <strong id="gameCount">0 games</strong>
+        <span>Ready to play</span>
+      </div>
+    </section>
+
+    <section id="categories" class="section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">EXPLORE</p>
+          <h2>Categories</h2>
         </div>
-        <div id="netStatus" class="net-status">Multiplayer uses peer-to-peer browser connections when available.</div>
       </div>
-      <div class="feature-strip">
-        <div><b>8+</b><span>3D CREATURES</span></div>
-        <div><b>P2P</b><span>REAL CO-OP</span></div>
-        <div><b>∞</b><span>BUILD & FARM</span></div>
-      </div>
-      <div class="tiny">WASD • Mouse • Space • E interact • B build • I inventory • M map • R ride • T tutorial</div>
-    </div>
-  </section>
+      <div id="categoryList" class="categories"></div>
+    </section>
 
-  <section id="hud" class="hidden">
-    <div class="topbar">
-      <div class="brand">DINO <span>FRONTIER</span></div>
-      <div class="zone" id="zone">Verdant Basin</div>
-      <div class="top-actions">
-        <button id="mapBtn">M</button><button id="invBtn">I</button><button id="tutorialBtn" title="Tutorial">?</button><button id="saveBtn">SAVE</button>
-      </div>
-    </div>
-
-    <div class="stats panel">
-      <div class="stat"><span>HEALTH</span><div class="bar"><i id="hpBar"></i></div><b id="hpTxt">100</b></div>
-      <div class="stat"><span>STAMINA</span><div class="bar"><i id="stBar"></i></div></div>
-      <div class="stat"><span>HUNGER</span><div class="bar"><i id="foodBar"></i></div></div>
-      <div class="stat"><span>THIRST</span><div class="bar"><i id="waterBar"></i></div></div>
-      <div class="stat"><span>TEMP</span><div class="bar"><i id="tempBar"></i></div></div>
-      <div class="level" id="level">LV 1</div>
-    </div>
-
-    <div class="quest panel" id="questPanel">
-      <div class="q-title"><span>FIELD LOG</span><b id="questTitle">The First Camp</b></div>
-      <div id="questDesc">Gather 10 wood to make your first shelter.</div>
-      <div class="quest-progress"><i id="questBar"></i></div>
-      <div id="questCount">0 / 10</div>
-    </div>
-
-    <div class="prompt" id="prompt">Explore the valley.</div>
-    <div class="notice-stack" id="notices"></div>
-
-    <div class="dino-card panel hidden" id="dinoCard">
-      <div class="dino-name" id="dinoName">Wild</div>
-      <div class="dino-species" id="dinoSpecies">Unknown creature</div>
-      <div class="mini-bar"><i id="dinoTameBar"></i></div>
-      <div class="dino-meta" id="dinoMeta">0% trust</div>
-      <div class="dino-actions"><button id="tameBtn">FEED</button><button id="rideBtn">RIDE</button><button id="commandBtn">COMMAND</button><button id="nameBtn">NAME</button></div>
-    </div>
-
-    <div class="hotbar panel" id="hotbar"></div>
-    <div class="controls panel"><b>WASD</b> move <b>SHIFT</b> sprint <b>SPACE</b> jump <b>E</b> interact <b>B</b> build <b>R</b> ride <b>C</b> command <b>N</b> breed <b>T</b> tutorial</div>
-    <canvas id="minimap" width="180" height="180"></canvas><div id="crosshair">+</div>
-    <div class="room-chip hidden" id="roomChip">ROOM <b id="roomOut"></b></div>
-    <div class="players panel" id="players">SOLO</div>
-
-    <div id="tutorialModal" class="modal hidden">
-      <div class="modal-card tutorial-card">
-        <button class="close" data-tutorial-close>×</button>
-        <div class="tutorial-kicker">WELCOME TO THE FRONTIER</div>
-        <h2>HOW TO PLAY</h2>
-        <p class="tutorial-lead">Start safely, learn the valley, then build your own dinosaur expedition.</p>
-        <div class="tutorial-grid">
-          <div><b>1. MOVE</b><span>WASD to walk. Mouse to look. Space to jump. Hold Shift to sprint.</span></div>
-          <div><b>2. SURVIVE</b><span>Gather berries, water, wood and stone. Stay fed and hydrated.</span></div>
-          <div><b>3. MEET DINOS</b><span>Press E near a dinosaur. Herbivores need trust; predators need patience and food.</span></div>
-          <div><b>4. TAME & RIDE</b><span>Keep feeding a wild companion. Once tamed, select it and press R to ride.</span></div>
-          <div><b>5. BUILD</b><span>Press B, choose a structure with 1–4, then click to place it.</span></div>
-          <div><b>6. FARM</b><span>Build a Garden, press E to plant, wait, then press E again to harvest.</span></div>
-          <div><b>7. BREED</b><span>Get two adult tamed dinos of the same species close together and press N.</span></div>
-          <div><b>8. MULTIPLAYER</b><span>Host a world and share the room code with your friends, or join theirs.</span></div>
+    <section id="games" class="section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LIBRARY</p>
+          <h2>Games</h2>
         </div>
-        <div class="tutorial-tip"><strong>Important:</strong> the area around your starting camp is a safe zone. Predators cannot damage you there, and their attacks are no longer instant-kills.</div>
-        <button class="primary tutorial-close" data-tutorial-close>GOT IT — LET'S EXPLORE</button>
+        <select id="sortSelect">
+          <option value="featured">Featured</option>
+          <option value="newest">Newest</option>
+          <option value="name">Name</option>
+        </select>
       </div>
-    </div>
-    <div id="mapModal" class="modal hidden">
-      <div class="modal-card wide"><button class="close" data-close="mapModal">×</button><h2>EXPEDITION MAP</h2><canvas id="mapCanvas" width="760" height="460"></canvas><p>Explore to reveal landmarks. Your camp is marked with a star.</p></div>
-    </div>
-    <div id="invModal" class="modal hidden">
-      <div class="modal-card"><button class="close" data-close="invModal">×</button><h2>PACK & WORKSHOP</h2><div id="inventoryGrid" class="inventory-grid"></div><h3>CRAFT</h3><div id="craftGrid" class="craft-grid"></div></div>
-    </div>
-    <div id="buildHud" class="build-hud hidden"><b>BUILD MODE</b><span id="buildChoice">HUT</span><small>1 Hut • 2 Fence • 3 Garden • 4 Storage • Click to place • B to exit</small></div>
-  </section>
+      <div id="gameGrid" class="game-grid"></div>
+      <div id="emptyState" class="empty hidden">
+        <div>🔎</div>
+        <h3>No games found</h3>
+        <p>Try another search or category.</p>
+      </div>
+    </section>
+  </main>
 
-  <script src="dino.js"></script>
+  <footer>
+    <strong>🎮 GameHub</strong>
+    <span>Built as a starter template. Add only games you own or have permission to distribute.</span>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
