@@ -1,0 +1,1833 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Dino Frontier 3D</title>
+  <style>
+:root{
+  --glass:rgba(9,16,19,.72);--line:rgba(255,255,255,.14);--text:#edf6ef;--muted:#a5b4ad;--accent:#b9f27c;--accent2:#59d6b7;--warn:#ffd478;
+}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#081014;color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}body{letter-spacing:.01em}button,input{font:inherit}button{border:1px solid var(--line);background:rgba(255,255,255,.07);color:#fff;padding:11px 14px;border-radius:12px;cursor:pointer;font-weight:800;letter-spacing:.04em}button:hover{background:rgba(255,255,255,.13)}button.primary{background:linear-gradient(135deg,#b9f27c,#59d6b7);color:#07120f;border:0}input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;border-radius:12px;padding:12px 13px;outline:none}input:focus{border-color:#b9f27c}.hidden{display:none!important}.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 42%,rgba(88,195,148,.12),transparent 35%),linear-gradient(180deg,#081315,#0a1216);z-index:10}.hero-glow{position:absolute;width:70vw;height:70vw;max-width:900px;max-height:900px;border-radius:50%;background:radial-gradient(circle,rgba(185,242,124,.12),transparent 60%);filter:blur(20px);animation:pulse 5s ease-in-out infinite}.hero{position:relative;z-index:2;width:min(760px,92vw);text-align:center}.eyebrow{font-size:12px;letter-spacing:.24em;color:#93b8a9;margin-bottom:10px}.hero h1{font-size:clamp(54px,10vw,110px);line-height:.85;margin:0;font-weight:1000;letter-spacing:-.06em}.hero h1 span{color:var(--accent)}.tagline{max-width:640px;margin:22px auto;color:#c8d5ce;font-size:17px;line-height:1.55}.panel{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.22)}.intro-panel{padding:20px;border-radius:20px;max-width:470px;margin:20px auto}.field-label{display:block;text-align:left;color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.12em;margin:0 0 7px}.actions{display:flex;gap:10px;margin-top:10px}.actions button{flex:1}.join-row{display:flex;gap:10px;margin-top:10px}.join-row input{flex:1}.join-row button{width:90px}.net-status{margin-top:12px;color:#95aaa0;font-size:12px;min-height:18px}.feature-strip{display:flex;justify-content:center;gap:12px;margin-top:16px}.feature-strip div{padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04);min-width:120px}.feature-strip b{display:block;font-size:18px;color:var(--accent)}.feature-strip span{display:block;color:var(--muted);font-size:10px;font-weight:900;margin-top:3px}.tiny{margin-top:16px;color:#789087;font-size:11px}.topbar{position:fixed;top:14px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;z-index:5}.brand{font-size:16px;font-weight:1000}.brand span{color:var(--accent)}.zone{font-size:11px;color:#e6efe9;font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:999px;padding:8px 13px}.top-actions{display:flex;gap:7px}.top-actions button{padding:7px 10px}.stats{position:fixed;top:60px;left:16px;padding:10px 12px;display:flex;gap:10px;align-items:end;border-radius:15px;z-index:4}.stat{min-width:96px}.stat span{display:block;font-size:8px;color:#9fb3aa;font-weight:900;letter-spacing:.15em;margin-bottom:4px}.bar,.mini-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}.bar i,.mini-bar i{display:block;height:100%;width:50%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px}.stat b{font-size:9px;color:#edf5ef}.level{font-weight:1000;color:var(--accent);font-size:13px;padding:0 4px 1px}.quest{position:fixed;top:60px;right:16px;width:285px;padding:13px 15px;border-radius:16px;z-index:4}.q-title span{font-size:8px;color:#8ca69b;letter-spacing:.2em;font-weight:900}.q-title b{display:block;margin-top:4px}.quest>div:nth-child(2){font-size:12px;color:#cad7d0;line-height:1.4;margin:7px 0}.quest-progress{height:5px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden}.quest-progress i{display:block;height:100%;width:0;background:var(--accent)}#questCount{font-size:10px;color:#91a79d;margin-top:5px}.prompt{position:fixed;bottom:105px;left:50%;transform:translateX(-50%);padding:10px 15px;border-radius:999px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);font-weight:900;font-size:12px;z-index:5;white-space:nowrap}.notice-stack{position:fixed;left:16px;bottom:115px;display:flex;flex-direction:column;gap:7px;z-index:5}.notice{background:rgba(7,14,17,.84);border:1px solid var(--line);padding:9px 12px;border-radius:12px;font-size:11px;animation:toast .25s ease-out}.dino-card{position:fixed;right:16px;bottom:112px;width:250px;padding:14px;border-radius:16px;z-index:5}.dino-name{font-weight:1000;font-size:17px}.dino-species{color:#96aaa1;font-size:11px;margin-bottom:9px}.dino-meta{font-size:10px;color:#93a79e;margin-top:5px}.dino-actions{display:flex;gap:6px;margin-top:10px}.dino-actions button{flex:1;padding:8px 6px;font-size:10px}.hotbar{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);padding:7px;border-radius:17px;display:flex;gap:6px;z-index:5}.slot{width:58px;height:58px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);position:relative;display:flex;align-items:center;justify-content:center;font-size:24px}.slot.sel{outline:2px solid var(--accent)}.slot small{position:absolute;top:4px;left:6px;font-size:8px;color:#93a79d}.slot b{position:absolute;bottom:4px;right:6px;font-size:9px}.controls{position:fixed;left:50%;transform:translateX(-50%);bottom:0;padding:5px 12px;border-radius:10px 10px 0 0;font-size:9px;color:#8fa39a;z-index:5}.controls b{color:#d8e5df}.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:20}.modal-card{position:relative;width:min(560px,94vw);max-height:90vh;overflow:auto;padding:24px;border-radius:20px;background:rgba(9,15,17,.95);border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5)}.modal-card.wide{width:min(820px,94vw)}.modal-card h2{margin:0 0 14px;letter-spacing:.07em}.modal-card h3{font-size:12px;letter-spacing:.1em;color:#9fb2aa;margin-top:18px}.close{position:absolute;top:12px;right:12px;padding:4px 10px}.inventory-grid,.craft-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.item,.craft{padding:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:12px}.item span,.craft span{display:block;color:#91a59c;font-size:9px}.item b,.craft b{font-size:14px}.craft button{width:100%;margin-top:7px;font-size:9px;padding:7px}.build-hud{position:fixed;left:50%;top:115px;transform:translateX(-50%);background:rgba(7,14,17,.83);border:1px solid var(--accent);padding:10px 14px;border-radius:14px;z-index:7;text-align:center}.build-hud b{color:var(--accent);display:block;font-size:12px}.build-hud span{display:block;font-size:14px;font-weight:1000;margin-top:2px}.build-hud small{display:block;color:#9cafa4;font-size:9px;margin-top:3px}.room-chip{position:fixed;left:16px;top:140px;padding:9px 12px;border-radius:999px;background:rgba(0,0,0,.36);border:1px solid var(--line);font-size:10px;z-index:4}.players{position:fixed;right:16px;bottom:16px;border-radius:12px;padding:8px 10px;font-size:10px;color:#a2b3ac;z-index:5}.players b{color:var(--accent)}canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block}#minimap{position:fixed;left:16px;bottom:114px;width:180px;height:180px;border:1px solid var(--line);border-radius:16px;background:rgba(4,9,10,.65);z-index:4;image-rendering:auto}
+@keyframes pulse{50%{transform:scale(1.08);opacity:.75}}@keyframes toast{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(max-width:800px){.quest{width:230px}.stats{transform:scale(.9);transform-origin:top left}.stat{min-width:75px}.dino-card{width:220px}.controls{display:none}.prompt{bottom:95px;max-width:80vw;overflow:hidden;text-overflow:ellipsis}.feature-strip{gap:6px}.feature-strip div{min-width:90px;padding:9px 10px}.intro-panel{margin-top:14px}}
+@media(max-width:600px){.quest{top:126px;right:10px}.stats{top:58px;left:10px;right:10px;justify-content:space-between;padding:8px}.stat{min-width:55px}.zone{display:none}.dino-card{right:10px;bottom:95px;width:210px}.notice-stack{left:10px;bottom:95px;max-width:55%}.hotbar{max-width:94vw;overflow:auto}.slot{min-width:52px;width:52px;height:52px}.slot:nth-child(n+7){display:none}#minimap{width:125px;height:125px;left:10px;bottom:95px}.players{right:10px;bottom:10px}}
+
+#crosshair{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;color:rgba(240,255,245,.8);font:900 18px/1 system-ui;pointer-events:none;text-shadow:0 1px 7px #000}
+
+/* Tutorial */
+.tutorial-card{width:min(820px,94vw);padding:28px}.tutorial-kicker{color:var(--accent2);font-size:10px;letter-spacing:.2em;font-weight:1000}.tutorial-lead{color:#c6d5ce;max-width:650px;line-height:1.5}.tutorial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}.tutorial-grid div{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04)}.tutorial-grid b{display:block;color:var(--accent);font-size:11px;letter-spacing:.06em;margin-bottom:4px}.tutorial-grid span{display:block;color:#b5c4bd;font-size:11px;line-height:1.45}.tutorial-tip{padding:12px 14px;border-left:3px solid var(--accent);background:rgba(185,242,124,.07);color:#cbd8d1;border-radius:10px;font-size:11px;line-height:1.45}.tutorial-close{width:100%;margin-top:14px}.top-actions #tutorialBtn{font-weight:1000}
+@media(max-width:650px){.tutorial-grid{grid-template-columns:1fr}.tutorial-card{padding:22px}.tutorial-card h2{font-size:22px}}
+
+/* Frontier visual polish */
+.hero:before{content:"";position:absolute;inset:-70px -100px;background:radial-gradient(circle at 50% 30%,rgba(89,214,183,.10),transparent 42%),radial-gradient(circle at 15% 80%,rgba(185,242,124,.08),transparent 30%);pointer-events:none;z-index:-1}
+.screen:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.018),transparent 28%,transparent 72%,rgba(0,0,0,.20)),radial-gradient(circle,transparent 55%,rgba(0,0,0,.35) 100%);mix-blend-mode:screen}
+.panel{box-shadow:0 16px 45px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.035)}
+.slot{transition:transform .15s ease,background .15s ease,border-color .15s ease}.slot:hover{transform:translateY(-3px);background:rgba(185,242,124,.08);border-color:rgba(185,242,124,.35)}
+.dino-card{background:linear-gradient(145deg,rgba(8,17,18,.88),rgba(13,29,27,.76))}.dino-actions button:first-child{border-color:rgba(185,242,124,.35)}
+.prompt{box-shadow:0 10px 35px rgba(0,0,0,.24);backdrop-filter:blur(10px)}
+#minimap{box-shadow:0 12px 35px rgba(0,0,0,.28)}
+
+.fatal{position:fixed;inset:0;z-index:100;background:#081014;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center}.fatal>div{width:min(520px,90vw);padding:30px;border:1px solid rgba(185,242,124,.35);border-radius:20px;background:rgba(10,20,22,.96)}.fatal h2{margin-top:0;color:#b9f27c}.fatal p{color:#b8c8c0;line-height:1.6}.fatal button{margin-top:10px}
+</style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <section id="start" class="screen active">
+    <div class="hero-glow"></div>
+    <div class="hero">
+      <div class="eyebrow">GAMEHUB • 3D PREHISTORIC SURVIVAL</div>
+      <h1>DINO <span>FRONTIER</span></h1>
+      <p class="tagline">Build a home. Grow a prehistoric farm. Earn a dinosaur's trust. Explore a living lost world with your friends.</p>
+      <div class="panel intro-panel">
+        <label class="field-label">Explorer name</label>
+        <input id="name" maxlength="16" value="Explorer" autocomplete="off">
+        <div class="row actions">
+          <button id="hostBtn" class="primary" type="button" onclick="window.hostDinoWorld && window.hostDinoWorld()">HOST WORLD</button>
+          <button id="soloBtn" type="button" onclick="window.playDinoSolo && window.playDinoSolo()">PLAY SOLO</button>
+        </div>
+        <div class="join-row">
+          <input id="room" maxlength="24" placeholder="Paste host room code">
+          <button id="joinBtn" type="button" onclick="window.joinDinoWorld && window.joinDinoWorld()">JOIN</button>
+        </div>
+        <div id="netStatus" class="net-status">Multiplayer uses peer-to-peer browser connections when available.</div>
+      </div>
+      <div class="feature-strip">
+        <div><b>8+</b><span>3D CREATURES</span></div>
+        <div><b>P2P</b><span>REAL CO-OP</span></div>
+        <div><b>∞</b><span>BUILD & FARM</span></div>
+      </div>
+      <div class="tiny">WASD • Mouse • Space • E interact • B build • I inventory • M map • R ride • T tutorial</div>
+    </div>
+  </section>
+
+  <section id="hud" class="hidden">
+    <div class="topbar">
+      <div class="brand">DINO <span>FRONTIER</span></div>
+      <div class="zone" id="zone">Verdant Basin</div>
+      <div class="top-actions">
+        <button id="mapBtn">M</button><button id="invBtn">I</button><button id="tutorialBtn" title="Tutorial">?</button><button id="saveBtn">SAVE</button>
+      </div>
+    </div>
+
+    <div class="stats panel">
+      <div class="stat"><span>HEALTH</span><div class="bar"><i id="hpBar"></i></div><b id="hpTxt">100</b></div>
+      <div class="stat"><span>STAMINA</span><div class="bar"><i id="stBar"></i></div></div>
+      <div class="stat"><span>HUNGER</span><div class="bar"><i id="foodBar"></i></div></div>
+      <div class="stat"><span>THIRST</span><div class="bar"><i id="waterBar"></i></div></div>
+      <div class="stat"><span>TEMP</span><div class="bar"><i id="tempBar"></i></div></div>
+      <div class="level" id="level">LV 1</div>
+    </div>
+
+    <div class="quest panel" id="questPanel">
+      <div class="q-title"><span>FIELD LOG</span><b id="questTitle">The First Camp</b></div>
+      <div id="questDesc">Gather 10 wood to make your first shelter.</div>
+      <div class="quest-progress"><i id="questBar"></i></div>
+      <div id="questCount">0 / 10</div>
+    </div>
+
+    <div class="prompt" id="prompt">Explore the valley.</div>
+    <div class="notice-stack" id="notices"></div>
+
+    <div class="dino-card panel hidden" id="dinoCard">
+      <div class="dino-name" id="dinoName">Wild</div>
+      <div class="dino-species" id="dinoSpecies">Unknown creature</div>
+      <div class="mini-bar"><i id="dinoTameBar"></i></div>
+      <div class="dino-meta" id="dinoMeta">0% trust</div>
+      <div class="dino-actions"><button id="tameBtn">FEED</button><button id="rideBtn">RIDE</button><button id="commandBtn">COMMAND</button><button id="nameBtn">NAME</button></div>
+    </div>
+
+    <div class="hotbar panel" id="hotbar"></div>
+    <div class="controls panel"><b>WASD</b> move <b>SHIFT</b> sprint <b>SPACE</b> jump <b>E</b> interact <b>B</b> build <b>R</b> ride <b>C</b> command <b>N</b> breed <b>T</b> tutorial</div>
+    <canvas id="minimap" width="180" height="180"></canvas><div id="crosshair">+</div>
+    <div class="room-chip hidden" id="roomChip">ROOM <b id="roomOut"></b></div>
+    <div class="players panel" id="players">SOLO</div>
+
+    <div id="tutorialModal" class="modal hidden">
+      <div class="modal-card tutorial-card">
+        <div class="tutorial-kicker">WELCOME TO THE FRONTIER</div>
+        <h2>YOUR FIRST EXPEDITION</h2>
+        <p class="tutorial-lead">This world is built for exploration, survival, taming and creating your own prehistoric home. Follow the field log and use these basics to get started.</p>
+        <div class="tutorial-grid">
+          <div><b>1. MOVE</b><span>WASD moves. Mouse looks around. SHIFT sprints while you have stamina. SPACE jumps.</span></div>
+          <div><b>2. SURVIVE</b><span>Gather berries, water, wood and stone. Stay fed and hydrated.</span></div>
+          <div><b>3. MEET DINOS</b><span>Press E near a dinosaur. Herbivores need trust; predators need patience and food.</span></div>
+          <div><b>4. TAME & RIDE</b><span>Keep feeding a wild companion. Once tamed, select it and press R to ride.</span></div>
+          <div><b>5. BUILD</b><span>Press B, choose a structure with 1–4, then click to place it.</span></div>
+          <div><b>6. FARM</b><span>Build a Garden, press E to plant, wait, then press E again to harvest.</span></div>
+          <div><b>7. BREED</b><span>Get two adult tamed dinos of the same species close together and press N.</span></div>
+          <div><b>8. MULTIPLAYER</b><span>Host a world and share the room code with your friends, or join theirs.</span></div>
+        </div>
+        <div class="tutorial-tip"><strong>Important:</strong> the area around your starting camp is a safe zone. Predators cannot damage you there, and their attacks are no longer instant-kills.</div>
+        <button class="primary tutorial-close" data-tutorial-close>GOT IT — LET'S EXPLORE</button>
+      </div>
+    </div>  
+    const quest={id:'camp',title:'The First Camp',desc:'Gather 10 wood to make your first shelter.',target:10,get:()=>player.wood,reward:'level'};
+  const questList=[
+    quest,
+    {id:'garden',title:'Green Thumb',desc:'Plant and harvest 3 garden plots.',target:3,get:()=>scene.farms.filter(f=>f.harvests>0).length,reward:'seeds'},
+    {id:'friend',title:'A New Companion',desc:'Earn the trust of a wild herbivore.',target:1,get:()=>player.tames.length,reward:'xp'},
+    {id:'scout',title:'Into the Unknown',desc:'Discover 4 landmarks.',target:4,get:()=>Object.keys(player.discoveries).length,reward:'xp'}
+  ];
+  let questIndex=0;
+
+  const keys=new Set(); let mouseDX=0,mouseDY=0,locked=false;
+  addEventListener('keydown',e=>{keys.add(e.code); if(['Space','KeyW','KeyA','KeyS','KeyD'].includes(e.code))e.preventDefault(); if(e.code==='KeyI')toggleModal('invModal'); if(e.code==='KeyM')toggleModal('mapModal'); if(e.code==='KeyB')toggleBuild(); if(e.code==='KeyR')rideNearest(); if(e.code==='KeyC')commandMounted(); if(e.code==='Digit1')scene.buildChoice=0; if(e.code==='Digit2')scene.buildChoice=1; if(e.code==='Digit3')scene.buildChoice=2; if(e.code==='Digit4')scene.buildChoice=3; if(e.code.startsWith('Digit'))updateBuildHUD(); if(e.code==='Escape'){if(scene.buildMode)toggleBuild(false); document.querySelectorAll('.modal').forEach(x=>x.classList.add('hidden'));}});
+  addEventListener('keyup',e=>keys.delete(e.code));
+  canvas.addEventListener('click',()=>{if(scene.buildMode){placeBuild();return;}if(document.getElementById('hud').classList.contains('hidden'))return;if(canvas.requestPointerLock)canvas.requestPointerLock();});
+  document.addEventListener('pointerlockchange',()=>locked=document.pointerLockElement===canvas);
+  addEventListener('mousemove',e=>{if(locked){mouseDX+=e.movementX;mouseDY+=e.movementY;}});
+
+  function objectMesh(kind){return MESH[kind]||MESH.box;}
+  function draw(kind,pos,scale,color,rot=[0,0,0],terrain=0){const p=[pos.x,pos.y,pos.z];const model=Mat.trs(p,rot,scale);gl.bindVertexArray(objectMesh(kind).vao);gl.uniformMatrix4fv(U.model,false,model);gl.uniform4f(U.color,color[0],color[1],color[2],color.length>3?color[3]:1);gl.uniform1i(U.terrain,terrain?1:0);gl.drawElements(gl.TRIANGLES,objectMesh(kind).count,gl.UNSIGNED_INT,0);}
+  const C={ground:[.19,.37,.22],water:[.05,.28,.35,.82],wood:[.30,.18,.09],stone:[.38,.40,.36],leaf:[.12,.31,.15],leaf2:[.24,.46,.2],sand:[.55,.48,.30],ruin:[.36,.35,.30],gold:[.76,.57,.18]};
+
+  function addTree(x,z,scale=1){scene.objects.push({kind:'tree',x,z,scale});}
+  function addRock(x,z,scale=1){scene.objects.push({kind:'rock',x,z,scale});}
+  function addLandmark(x,z,label){scene.objects.push({kind:'landmark',x,z,label,seen:false});}
+  function generateWorld(){
+    scene.objects.push({kind:'npc',x:5,z:5,name:'Rhea',title:'Field Guide',phase:0});
+    for(let i=0;i<210;i++){const x=wrnd(-112,112),z=wrnd(-112,112),h=heightAt(x,z); if(h<0.7||Math.hypot(x,z)<10)continue; addTree(x,z,wrnd(.65,1.45));}
+    for(let i=0;i<130;i++){const x=wrnd(-120,120),z=wrnd(-120,120),h=heightAt(x,z); if(h<.2||Math.hypot(x,z)<8)continue;addRock(x,z,wrnd(.45,1.2));}
+    for(let i=0;i<18;i++){const a=i/18*TAU,r=wrnd(45,108);addLandmark(Math.cos(a)*r,Math.sin(a)*r,wpick(['Mossy Arch','Sunken Ruins','Echo Cave','Redwood Gate','Fossil Ridge','Sky Cliffs']));}
+    scene.resources=[];
+    const resourceTypes=['wood','stone','berries','fiber','crystal','clay','water','meat'];
+    for(let i=0;i<115;i++){
+      const x=wrnd(-105,105),z=wrnd(-105,105);
+      if(Math.hypot(x,z)<14)continue;
+      let type=wpick(resourceTypes);
+      if(type==='water') z=wrnd(-98,-72);
+      scene.resources.push({type,x,z,active:true,respawn:0,pulse:wrnd(0,TAU)});
+    }
+  }
+  generateWorld();
+
+  const dinoParts={};
+  function spawnDino(type,x,z,wild=true,id=null){const s=species[type];const d={id:id||'d'+Math.random().toString(36).slice(2),type,x,y:Math.max(0.2,heightAt(x,z)),z,yaw:rnd(-Math.PI,Math.PI),state:'wander',target:null,tame:0,level:1+((Math.random()*4)|0),hp:s.hp,maxHp:s.hp,speed:s.speed,name:'Wild '+s.name,command:'follow',wild,phase:rnd(0,10),cool:rnd(0,2),baby:false,born:0,variant:Math.random(),owner:null,boss:!!s.boss,defeated:false};scene.dinos.push(d);return d;}
+  const types=Object.keys(species).filter(k=>k!=='titan'); for(let i=0;i<26;i++){const type=wpick(types),a=wrnd(0,TAU),r=wrnd(34,105);spawnDino(type,Math.cos(a)*r,Math.sin(a)*r,true,'wild-'+i)}
+  spawnDino('titan',72,68,true,'boss-titan').boss=true; window.__DINO_FRONTIER__.world={dinos:scene.dinos.length,trees:scene.objects.filter(o=>o.kind==='tree').length,landmarks:scene.objects.filter(o=>o.kind==='landmark').length};
+
+  const playerMesh={x:0};
+  function drawPlayer(p,isRemote=false){
+    const baseY=p.y+1.15;
+    const skin=isRemote?[.30,.56,.76]:[.46,.69,.50];
+    const shirt=isRemote?[.10,.22,.36]:[.16,.29,.23];
+    const boot=[.08,.10,.11];
+    const body={x:p.x,y:baseY,z:p.z};
+    draw('sphere',{x:p.x,y:p.y+.03,z:p.z},[.72,.035,.48],[.025,.035,.025],[0,0,0]);
+    draw('box',body,[.58,.82,.42],shirt,[0,p.yaw,0]);
+    const neck=Mat.mulVecY({x:p.x,y:baseY+1.0,z:p.z},p.yaw,0,0);
+    draw('box',neck,[.22,.20,.22],skin,[0,p.yaw,0]);
+    draw('sphere',{x:neck.x,y:neck.y+.38,z:neck.z},[.39,.42,.36],skin,[0,p.yaw,0]);
+    const hair=Mat.mulVecY({x:p.x,y:neck.y+.66,z:p.z},p.yaw,0,-.03);
+    draw('sphere',{x:hair.x,y:hair.y,z:hair.z},[.40,.18,.37],[.055,.045,.035],[0,p.yaw,0]);
+    const face=Mat.mulVecY({x:p.x,y:neck.y+.40,z:p.z},p.yaw,.34,0);
+    for(const side of [-1,1]){
+      const eye=Mat.mulVecY(face,p.yaw,0,side*.13);
+      draw('sphere',{x:eye.x,y:eye.y+.03,z:eye.z},[.055,.055,.035],[.96,.98,.92],[0,p.yaw,0]);
+      const pupil=Mat.mulVecY(eye,p.yaw,.045,0);
+      draw('sphere',{x:pupil.x,y:pupil.y,z:pupil.z},[.025,.025,.018],[.03,.04,.03]);
+    }
+    const swing=Math.sin(scene.time*5.5+p.yaw)*.08;
+    for(const side of [-1,1]){
+      const shoulder=Mat.mulVecY(body,p.yaw,0,side*.55);
+      const elbow=Mat.mulVecY({x:shoulder.x,y:shoulder.y-.36,z:shoulder.z},p.yaw,.04,side*.02);
+      const hand=Mat.mulVecY({x:shoulder.x,y:shoulder.y-.72,z:shoulder.z},p.yaw,.20,side*.05);
+      draw('box',shoulder,[.15,.48,.15],shirt,[swing*side,p.yaw,0]);
+      draw('sphere',{x:hand.x,y:hand.y,z:hand.z},[.16,.17,.15],skin,[0,p.yaw,0]);
+      for(let f=0;f<3;f++){
+        const finger=Mat.mulVecY(hand,p.yaw,.13+f*.035,side*(.04-f*.035));
+        draw('box',{x:finger.x,y:finger.y-.06,z:finger.z},[.035,.10,.035],skin,[0,p.yaw,0]);
+      }
+    }
+    for(const side of [-1,1]){
+      const leg=Mat.mulVecY({x:p.x,y:baseY-.85,z:p.z},p.yaw,0,side*.27);
+      draw('box',leg,[.20,.68,.20],shirt,[0,p.yaw,0]);
+      const boot=Mat.mulVecY({x:leg.x,y:leg.y-.45,z:leg.z},p.yaw,.10,0);
+      draw('box',{x:boot.x,y:boot.y,z:boot.z},[.24,.18,.34],boot,[0,p.yaw,0]);
+    }
+    const pack=Mat.mulVecY(body,p.yaw,-.34,0);
+    draw('box',{x:pack.x,y:pack.y+.12,z:pack.z},[.32,.52,.18],[.20,.15,.10],[0,p.yaw,0]);
+    const tool=Mat.mulVecY(body,p.yaw,.62,-.04);
+    draw('box',{x:tool.x,y:tool.y-.12,z:tool.z},[.035,.62,.035],[.38,.22,.10],[0,p.yaw,0]);
+    const blade=Mat.mulVecY({x:tool.x,y:tool.y+.22,z:tool.z},p.yaw,.02,0);
+    draw('box',{x:blade.x,y:blade.y,z:blade.z},[.24,.12,.05],[.55,.61,.60],[0,p.yaw,.12]);
+  }
+  function drawDino(d){
+    const s=species[d.type], q=s.size*(d.baby?.52:1), y=d.y+q*1.1;
+    const bodyCol=s.color.map(v=>clamp(v+(d.variant-.5)*.10,0,1)); const ac=s.accent;
+    const body={x:d.x,y,z:d.z};
+    draw('sphere',{x:d.x,y:d.y+.035,z:d.z},[1.35*q,.035,.78*q],[.025,.035,.025],[0,0,0]);
+    draw('sphere',body,[1.25*q,.72*q,.65*q],bodyCol,[0,d.yaw,0]);
+    const neck=Mat.mulVecY(body,d.yaw,.52*q,0);
+    draw('sphere',{x:neck.x,y:y+.22*q,z:neck.z},[.55*q,.58*q,.50*q],bodyCol,[0,d.yaw,0]);
+    const head=Mat.mulVecY(body,d.yaw,.96*q,-.02*q);
+    draw('sphere',head,[.52*q,.48*q,.48*q],bodyCol,[0,d.yaw,0]);
+    const snout=Mat.mulVecY(body,d.yaw,1.32*q,-.03*q);
+    draw('box',snout,[.46*q,.22*q,.30*q],ac,[0,d.yaw,0]);
+    for(const side of [-1,1]){
+      const eye=Mat.mulVecY(head,d.yaw,.32*q,side*.27*q);
+      draw('sphere',{x:eye.x,y:eye.y+.12*q,z:eye.z},[.075*q,.075*q,.055*q],[.98,.90,.45],[0,d.yaw,0]);
+      const pupil=Mat.mulVecY(eye,d.yaw,.045*q,0);
+      draw('sphere',{x:pupil.x,y:pupil.y,z:pupil.z},[.035*q,.035*q,.025*q],[.015,.02,.015],[0,d.yaw,0]);
+    }
+    const swing=Math.sin(scene.time*8+d.phase)*.12;
+    const legY=y-.75*q;
+    for(const side of [-1,1])for(const front of [-1,1]){
+      const lp=Mat.mulVecY(body,d.yaw,front*.55*q,side*.36*q);
+      draw('box',{x:lp.x,y:legY,z:lp.z},[.18*q,.72*q,.18*q],bodyCol,[swing*front,d.yaw+swing*side,0]);
+      const foot=Mat.mulVecY({x:lp.x,y:legY-.34*q,z:lp.z},d.yaw,.12*q,0);
+      draw('box',{x:foot.x,y:foot.y,z:foot.z},[.24*q,.10*q,.32*q],ac,[0,d.yaw,0]);
+    }
+    const tail=Mat.mulVecY(body,d.yaw,-1.35*q,0);
+    draw('cone',{x:tail.x,y:y+.02*q,z:tail.z},[.48*q,.58*q,.48*q],[bodyCol[0]*.9,bodyCol[1]*.9,bodyCol[2]*.9],[0,d.yaw+Math.PI/2,Math.PI/2]);
+    if(d.type==='trike'){
+      for(const side of [-1,1]){
+        const horn=Mat.mulVecY(head,d.yaw,.22*q,side*.22*q);
+        draw('cone',horn,[.11*q,.52*q,.11*q],ac,[0,d.yaw,side*.15]);
+      }
+      draw('box',Mat.mulVecY(head,d.yaw,-.20*q,0),[.46*q,.26*q,.08*q],ac,[0,d.yaw,0]);
+    }
+    if(d.type==='stego')for(let i=0;i<6;i++){
+      const p=Mat.mulVecY(body,d.yaw,-.35*q-i*.27*q,0);
+      draw('cone',{x:p.x,y:p.y+.62*q,z:p.z},[.24*q,.55*q,.16*q],ac,[0,d.yaw,0]);
+    }
+    if(d.type==='anky'){
+      const p=Mat.mulVecY(body,d.yaw,-1.25*q,0);
+      draw('sphere',{x:p.x,y:y-.1*q,z:p.z},[.35*q,.35*q,.35*q],ac);
+    }
+    if(d.type==='rex'){
+      for(const side of [-1,1]){
+        const arm=Mat.mulVecY(body,d.yaw,.55*q,side*.42*q);
+        draw('box',{x:arm.x,y:y-.25*q,z:arm.z},[.10*q,.32*q,.10*q],bodyCol,[.3,d.yaw,side*.2]);
+      }
+      for(let i=0;i<5;i++){
+        const tooth=Mat.mulVecY(snout,d.yaw,.15*q+i*.13*q,0);
+        draw('cone',{x:tooth.x,y:y-.02*q,z:tooth.z},[.045*q,.14*q,.045*q],[.94,.88,.66],[0,d.yaw,0]);
+      }
+    }
+    if(d.type==='carno')for(const side of [-1,1]){
+      const horn=Mat.mulVecY(head,d.yaw,.02*q,side*.22*q);
+      draw('cone',{x:horn.x,y:horn.y+.36*q,z:horn.z},[.10*q,.30*q,.10*q],ac,[0,d.yaw,0]);
+    }
+    if(d.type==='raptor')for(const side of [-1,1]){
+      const claw=Mat.mulVecY(body,d.yaw,.58*q,side*.38*q);
+      draw('cone',{x:claw.x,y:claw.y-.32*q,z:claw.z},[.08*q,.28*q,.08*q],ac,[Math.PI*.55,d.yaw,0]);
+    }
+    if(d.type==='ptera')for(const side of [-1,1]){
+      const w=Mat.mulVecY(body,d.yaw,0,side*1.0*q);
+      draw('box',{x:w.x,y:y+.15*q,z:w.z},[.85*q,.08*q,.55*q],ac,[0,d.yaw,side*.25]);
+    }
+    if(d.boss){
+      draw('sphere',{x:d.x,y:y+1.7*q,z:d.z},[.22*q,.22*q,.22*q],ac);
+      draw('sphere',{x:d.x,y:y+2.15*q,z:d.z},[.12*q,.12*q,.12*q],[1,.85,.25]);
+    }
+    if(!d.wild)draw('sphere',{x:d.x,y:y+1.15*q,z:d.z},[.16*q,.16*q,.16*q],[.95,.78,.24]);
+    if(d.baby)draw('sphere',{x:d.x,y:y+.65*q,z:d.z},[.22*q,.22*q,.22*q],ac);
+  }
+
+  function resourceObject(r){
+    if(!r.active)return;
+    const y=heightAt(r.x,r.z), bob=Math.sin(scene.time*2+r.pulse)*.08;
+    if(r.type==='wood'){
+      draw('box',{x:r.x,y:y+.45+bob,z:r.z},[.28,.75,.28],C.wood,[.2,r.pulse,0]);
+      draw('box',{x:r.x+.18,y:y+.95+bob,z:r.z+.08},[.20,.20,.20],[.48,.29,.12],[0,r.pulse,.2]);
+    } else if(r.type==='stone'){
+      draw('sphere',{x:r.x,y:y+.48+bob,z:r.z},[.62,.48,.58],C.stone,[0,r.pulse,0]);
+      draw('cone',{x:r.x+.2,y:y+.85+bob,z:r.z},[.20,.34,.20],[.55,.57,.54]);
+    } else if(r.type==='berries'){
+      draw('sphere',{x:r.x,y:y+.55+bob,z:r.z},[.72,.48,.72],C.leaf2);
+      for(let i=0;i<5;i++){
+        const a=i/5*TAU;
+        draw('sphere',{x:r.x+Math.cos(a)*.35,y:y+.60+bob+Math.sin(i)*.08,z:r.z+Math.sin(a)*.35},[.09,.09,.09],[.76,.16,.24]);
+      }
+            } else if(r.type==='fiber'){
+      draw('sphere',{x:r.x,y:y+.55+bob,z:r.z},[.55,.38,.55],[.24,.48,.25]);
+      for(let i=0;i<5;i++){
+        const a=i/5*TAU;
+        draw('box',{x:r.x+Math.cos(a)*.30,y:y+.72+bob,z:r.z+Math.sin(a)*.30},[.06,.42,.06],[.33,.64,.30],[0,a,0]);
+      }
+    } else if(r.type==='crystal'){
+      draw('cone',{x:r.x,y:y+.75+bob,z:r.z},[.35,.95,.35],[.30,.72,.85],[0,r.pulse,0]);
+      draw('cone',{x:r.x+.35,y:y+.55+bob,z:r.z+.12},[.20,.55,.20],[.45,.82,.92],[0,-r.pulse,0]);
+    } else if(r.type==='clay'){
+      draw('sphere',{x:r.x,y:y+.34+bob,z:r.z},[.70,.35,.60],[.45,.27,.18]);
+    } else if(r.type==='water'){
+      draw('sphere',{x:r.x,y:y+.28+bob,z:r.z},[.62,.28,.62],[.08,.43,.60,.85]);
+    } else if(r.type==='meat'){
+      draw('sphere',{x:r.x,y:y+.32+bob,z:r.z},[.42,.28,.35],[.55,.14,.12]);
+    }
+  }
+
+  function drawWorld(){
+    const range=150;
+    draw('terrain',{x:0,y:0,z:0},[1,1,1],C.ground,[0,0,0],1);
+    draw('box',{x:0,y:-2.2,z:0},[150,4,150],[.08,.12,.10]);
+    draw('box',{x:0,y:-.15,z:-92},[24,.30,38],C.water);
+    draw('box',{x:-74,y:-.05,z:54},[32,.20,23],C.water);
+
+    for(const o of scene.objects){
+      const dist=Math.hypot(o.x-player.x,o.z-player.z);
+      if(dist>range)continue;
+      const y=heightAt(o.x,o.z);
+      if(o.kind==='tree'){
+        const s=o.scale;
+        draw('box',{x:o.x,y:y+1.5*s,z:o.z},[.35*s,1.6*s,.35*s],C.wood,[0,o.x*.1,0]);
+        draw('sphere',{x:o.x,y:y+3.0*s,z:o.z},[1.55*s,1.55*s,1.55*s],C.leaf2);
+        draw('sphere',{x:o.x+.65*s,y:y+2.55*s,z:o.z+.15*s},[.9*s,1.05*s,.9*s],C.leaf);
+      }else if(o.kind==='rock'){
+        draw('sphere',{x:o.x,y:y+.40*o.scale,z:o.z},[.9*o.scale,.55*o.scale,.75*o.scale],C.stone,[0,o.x,0]);
+      }else if(o.kind==='landmark'){
+        for(let i=0;i<3;i++){
+          const a=i/3*TAU;
+          draw('box',{x:o.x+Math.cos(a)*1.7,y:y+1.3,z:o.z+Math.sin(a)*1.7},[.65,2.6,.65],C.ruin,[0,a,0]);
+        }
+        draw('box',{x:o.x,y:y+2.5,z:o.z},[2.6,.45,1.0],C.ruin,[0,.3,0]);
+      }else if(o.kind==='npc'){
+        drawNPC(o);
+      }
+    }
+
+    for(const r of scene.resources)resourceObject(r);
+    for(const b of scene.builds)drawBuild(b);
+    for(const f of scene.farms)drawFarm(f);
+    for(const d of scene.dinos){
+      if(Math.hypot(d.x-player.x,d.z-player.z)<range)drawDino(d);
+    }
+    drawPlayer(player);
+    for(const rp of Object.values(scene.remotePlayers))drawPlayer(rp,true);
+  }
+
+  function drawNPC(o){
+    const y=heightAt(o.x,o.z);
+    const bob=Math.sin(scene.time*2+o.phase)*.05;
+    draw('sphere',{x:o.x,y:y+1.8+bob,z:o.z},[.42,.48,.36],[.53,.39,.25]);
+    draw('box',{x:o.x,y:y+.95+bob,z:o.z},[.48,.78,.35],[.18,.36,.30],[0,o.phase,0]);
+    draw('sphere',{x:o.x,y:y+2.25+bob,z:o.z},[.40,.42,.36],[.58,.42,.27]);
+    draw('box',{x:o.x,y:y+2.62+bob,z:o.z},[.48,.10,.40],[.16,.12,.08],[0,o.phase,0]);
+    draw('sphere',{x:o.x-.14,y:y+2.30+bob,z:o.z+.34},[.055,.055,.055],[.95,.95,.80]);
+    draw('sphere',{x:o.x+.14,y:y+2.30+bob,z:o.z+.34},[.055,.055,.055],[.95,.95,.80]);
+  }
+
+  function drawBuild(b){
+    if(b.type==='campfire'){
+      draw('sphere',{x:b.x,y:b.y+.12,z:b.z},[.9,.12,.9],[.18,.12,.08]);
+      for(let i=0;i<6;i++){
+        const a=i/6*TAU;
+        draw('box',{x:b.x+Math.cos(a)*.35,y:b.y+.22,z:b.z+Math.sin(a)*.35},[.10,.10,.52],[.32,.18,.08],[0,a,0]);
+      }
+      draw('sphere',{x:b.x,y:b.y+.55,z:b.z},[.25,.45,.25],[1,.36,.08]);
+      draw('sphere',{x:b.x,y:b.y+.78,z:b.z},[.14,.30,.14],[1,.78,.18]);
+    }else if(b.type==='wall'){
+      draw('box',{x:b.x,y:b.y+1.2,z:b.z},[.16,1.2,2.1],[.32,.20,.10],[0,b.rot,0]);
+      for(let i=-1;i<=1;i++)draw('box',{x:b.x,y:b.y+1.2+i*.55,z:b.z},[.19,.05,2.15],[.42,.27,.12],[0,b.rot,0]);
+    }else if(b.type==='floor'){
+      draw('box',{x:b.x,y:b.y+.08,z:b.z},[2.1,.12,2.1],[.34,.22,.12],[0,b.rot,0]);
+    }else if(b.type==='garden'){
+      draw('box',{x:b.x,y:b.y+.12,z:b.z},[1.8,.20,1.8],[.30,.19,.09],[0,b.rot,0]);
+      for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){
+        const p=Mat.mulVecY({x:b.x,y:b.y+.28,z:b.z},b.rot,i*.55,j*.55);
+        draw('sphere',{x:p.x,y:p.y,z:p.z},[.10,.16,.10],[.18,.45,.18]);
+      }
+    }else if(b.type==='fence'){
+      for(let i=-1;i<=1;i++){
+        const p=Mat.mulVecY({x:b.x,y:b.y,z:b.z},b.rot,i*1.2,0);
+        draw('box',{x:p.x,y:b.y+1,z:p.z},[.10,1,.10],[.32,.20,.10]);
+      }
+      draw('box',{x:b.x,y:b.y+1,z:b.z},[1.5,.12,.10],[.42,.26,.12],[0,b.rot,0]);
+      draw('box',{x:b.x,y:b.y+.45,z:b.z},[1.5,.10,.10],[.42,.26,.12],[0,b.rot,0]);
+    }else if(b.type==='beacon'){
+      draw('box',{x:b.x,y:b.y+1.0,z:b.z},[.18,1.0,.18],[.35,.55,.58]);
+      draw('sphere',{x:b.x,y:b.y+2.0,z:b.z},[.35,.35,.35],[.35,.85,.92]);
+    }
+  }
+
+  function drawFarm(f){
+    drawBuild({type:'garden',x:f.x,y:f.y,z:f.z,rot:f.rot});
+    if(f.ready){
+      draw('sphere',{x:f.x,y:f.y+1.05,z:f.z},[.55,.55,.55],[.45,.78,.18]);
+    }else if(f.planted){
+      draw('sphere',{x:f.x,y:f.y+.52,z:f.z},[.18,.22,.18],[.35,.65,.18]);
+    }
+  }
+
+  function nearestDino(max=7){
+    let best=null,bd=max;
+    for(const d of scene.dinos){
+      if(d.defeated)continue;
+      const dd=Math.hypot(d.x-player.x,d.z-player.z);
+      if(dd<bd){best=d;bd=dd}
+    }
+    return best;
+  }
+
+  function interact(){
+    const d=nearestDino(7);
+    if(d){
+      selectedDino=d;
+      showDinoCard(d);
+      if(!d.wild){
+        notice(`${d.name} is waiting for your command.`);
+      }else{
+        feedDino(d);
+      }
+      return;
+    }
+
+    let closest=null,cd=4.5;
+    for(const r of scene.resources){
+      if(!r.active)continue;
+      const dd=Math.hypot(r.x-player.x,r.z-player.z);
+      if(dd<cd){closest=r;cd=dd}
+    }
+    if(closest){
+      gather(closest);
+      return;
+    }
+
+    let farm=null,fd=4;
+    for(const f of scene.farms){
+      const dd=Math.hypot(f.x-player.x,f.z-player.z);
+      if(dd<fd){farm=f;fd=dd}
+    }
+    if(farm){
+      if(!farm.planted){farm.planted=true;farm.readyAt=scene.time+25;farm.ready=false;notice('Seeds planted. Give them time to grow.');}
+      else if(farm.ready){farm.planted=false;farm.ready=false;farm.harvests++;player.berries+=6;player.xp+=18;notice('Harvest collected: +6 berries.');}
+      else notice('This crop is still growing.');
+      return;
+    }
+
+    for(const o of scene.objects){
+      if(o.kind==='npc'&&Math.hypot(o.x-player.x,o.z-player.z)<5){
+        notice(`${o.name}: The valley is full of resources. Tame creatures, build a farm and explore the ruins.`);
+        player.xp+=5;
+        return;
+      }
+      if(o.kind==='landmark'&&!o.seen&&Math.hypot(o.x-player.x,o.z-player.z)<5){
+        o.seen=true;
+        player.discoveries[o.label]=true;
+        player.xp+=40;
+        notice(`Discovered ${o.label}! +40 XP`);
+        return;
+      }
+    }
+    notice('Nothing nearby to interact with.');
+  }
+
+  function gather(r){
+    r.active=false;
+    r.respawn=scene.time+18+Math.random()*15;
+    const amount=r.type==='crystal'?1:r.type==='wood'?3:r.type==='stone'?3:r.type==='berries'?4:r.type==='fiber'?5:r.type==='clay'?3:r.type==='water'?3:2;
+    player[r.type]=(player[r.type]||0)+amount;
+    player.xp+=amount*2;
+    notice(`Gathered ${amount} ${r.type}.`);
+    updateQuest();
+    updateHotbar();
+  }
+
+  function feedDino(d){
+    if(!d.wild){notice(`${d.name} already trusts you.`);return;}
+    if(player.berries<2&&player.meat<1){notice('You need berries or meat to feed this creature.');return;}
+    const s=species[d.type];
+    const food=s.herbivore?'berries':'meat';
+    if(food==='berries'){
+      if(player.berries<2){notice('You need 2 berries.');return}
+      player.berries-=2;
+    }else{
+      if(player.meat<1){notice('You need 1 meat.');return}
+      player.meat--;
+    }
+    d.tame=clamp(d.tame+14,0,100);
+    player.xp+=8;
+    notice(`${d.name} trust: ${Math.round(d.tame)}%`);
+    if(d.tame>=100){
+      d.wild=false;
+      d.owner=player.name;
+      d.name=player.name+"'s "+s.name;
+      player.tames.push(d.id);
+      player.xp+=60;
+      notice(`${s.name} is now your companion!`);
+    }
+    updateQuest();
+    showDinoCard(d);
+  }
+
+  function showDinoCard(d){
+    if(!d)return;
+    document.getElementById('dinoCard').classList.remove('hidden');
+    document.getElementById('dinoName').textContent=d.name;
+    document.getElementById('dinoSpecies').textContent=species[d.type].name+(d.baby?' • BABY':'')+(d.boss?' • ELDER':'');
+    document.getElementById('dinoTameBar').style.width=(d.wild?d.tame:100)+'%';
+    document.getElementById('dinoMeta').textContent=d.wild?`${Math.round(d.tame)}% trust • Lv ${d.level}`:`Tamed • Lv ${d.level} • ${d.command}`;
+    document.getElementById('rideBtn').textContent=mounted===d?'DISMOUNT':'RIDE';
+    document.getElementById('tameBtn').textContent=d.wild?'FEED':'PET';
+  }
+
+  document.getElementById('tameBtn').onclick=()=>selectedDino&&feedDino(selectedDino);
+  document.getElementById('rideBtn').onclick=()=>selectedDino&&rideDino(selectedDino);
+  document.getElementById('commandBtn').onclick=()=>selectedDino&&cycleCommand(selectedDino);
+  document.getElementById('nameBtn').onclick=()=>selectedDino&&renameDino(selectedDino);
+
+  function renameDino(d){
+    const n=prompt('Give your dinosaur a name:',d.name);
+    if(n&&n.trim()){d.name=n.trim().slice(0,22);notice(`Named ${d.name}.`);showDinoCard(d);saveGame();}
+  }
+
+  function cycleCommand(d){
+    if(d.wild){notice('Tame this dinosaur first.');return}
+    const list=['follow','stay','guard','wander'];
+    d.command=list[(list.indexOf(d.command)+1)%list.length];
+    notice(`${d.name}: ${d.command.toUpperCase()}`);
+    showDinoCard(d);
+  }
+
+  function rideDino(d){
+    if(d.wild){notice('You must tame this dinosaur first.');return}
+    if(mounted===d){
+      mounted=null;player.riding=false;notice('You dismounted.');
+      return;
+    }
+    if(d.baby){notice('This dinosaur is still growing.');return}
+    mounted=d;player.riding=true;
+    notice(`Riding ${d.name}.`);
+  }
+
+  function rideNearest(){
+    const d=selectedDino||nearestDino(6);
+    if(d)rideDino(d);else notice('No companion nearby.');
+  }
+
+  function commandMounted(){
+    if(!mounted){notice('You are not riding a dinosaur.');return}
+    cycleCommand(mounted);
+  }
+
+  function breedNearest(){
+    if(!selectedDino||selectedDino.wild){notice('Select a tamed adult dinosaur first.');return}
+    const a=selectedDino;
+    if(a.baby){notice('Babies cannot breed yet.');return}
+    const partner=scene.dinos.find(d=>d!==a&&!d.wild&&!d.baby&&d.type===a.type&&Math.hypot(d.x-a.x,d.z-a.z)<7);
+    if(!partner){notice('Bring two adult tamed dinos of the same species together.');return}
+    const baby=spawnDino(a.type,(a.x+partner.x)/2,(a.z+partner.z)/2,false);
+    baby.baby=true;baby.growth=0;baby.owner=player.name;baby.name='Baby '+species[a.type].name;baby.tame=100;baby.hp=Math.round(a.maxHp*.45);baby.maxHp=baby.hp;player.tames.push(baby.id);
+    notice(`A baby ${species[a.type].name} was born!`);
+    player.xp+=50;
+  }
+
+  function updateDinos(dt){
+    for(const d of scene.dinos){
+      if(d.defeated)continue;
+      d.phase+=dt;
+      d.cool-=dt;
+
+      if(d.baby){
+        d.growth=(d.growth||0)+dt;
+        if(d.growth>120){
+          d.baby=false;
+          d.hp=Math.round(species[d.type].hp*.65);
+          d.maxHp=d.hp;
+          notice(`${d.name} grew up!`);
+        }
+      }
+
+      if(!d.wild){
+        const dist=Math.hypot(d.x-player.x,d.z-player.z);
+        if(mounted===d){
+          d.x=player.x-Math.sin(player.yaw)*1.2;
+          d.z=player.z-Math.cos(player.yaw)*1.2;
+          d.y=heightAt(d.x,d.z);
+          d.yaw=player.yaw;
+          continue;
+        }
+        if(d.command==='follow'&&dist>4){
+          moveToward(d,player.x,player.z,dt,d.speed*1.15);
+        }else if(d.command==='guard'&&dist>9){
+          moveToward(d,player.x,player.z,dt,d.speed);
+        }else if(d.command==='wander'){
+          wanderDino(d,dt);
+        }
+        continue;
+      }
+
+      if(d.boss){
+        const dd=Math.hypot(d.x-player.x,d.z-player.z);
+        if(dd<18&&!isSafeZone(player.x,player.z)){
+          moveToward(d,player.x,player.z,dt,d.speed);
+          if(dd<4.5&&d.cool<=0){damagePlayer(8);d.cool=2.2}
+        }else wanderDino(d,dt);
+        continue;
+      }
+
+      const dd=Math.hypot(d.x-player.x,d.z-player.z);
+      const s=species[d.type];
+      if(s.aggressive&&dd<12&&!isSafeZone(player.x,player.z)){
+        d.state='chase';
+        moveToward(d,player.x,player.z,dt,d.speed*1.15);
+        if(dd<3.2&&d.cool<=0){damagePlayer(s.damage);d.cool=2.0}
+      }else if(!s.aggressive&&dd<5){
+        d.state='flee';
+        moveAway(d,player.x,player.z,dt,d.speed*1.35);
+      }else if(Math.random()<.008){
+        d.state='wander';
+      }else{
+        wanderDino(d,dt);
+      }
+    }
+  }
+          function wanderDino(d,dt){
+    if(!d.wanderX||Math.random()<.01){
+      const a=Math.random()*TAU,r=4+Math.random()*14;
+      d.wanderX=d.x+Math.cos(a)*r;
+      d.wanderZ=d.z+Math.sin(a)*r;
+    }
+    if(Math.hypot(d.x-d.wanderX,d.z-d.wanderZ)>1.5)moveToward(d,d.wanderX,d.wanderZ,dt,d.speed*.45);
+    else d.yaw+=Math.sin(d.phase)*dt*.5;
+  }
+
+  function moveToward(d,x,z,dt,speed){
+    const dx=x-d.x,dz=z-d.z,len=Math.hypot(dx,dz)||1;
+    d.x+=dx/len*speed*dt;
+    d.z+=dz/len*speed*dt;
+    d.yaw=Math.atan2(dx,dz);
+    const limit=128;
+    d.x=clamp(d.x,-limit,limit);
+    d.z=clamp(d.z,-limit,limit);
+    d.y=heightAt(d.x,d.z);
+  }
+
+  function moveAway(d,x,z,dt,speed){
+    const dx=d.x-x,dz=d.z-z,len=Math.hypot(dx,dz)||1;
+    d.x+=dx/len*speed*dt;
+    d.z+=dz/len*speed*dt;
+    d.yaw=Math.atan2(dx,dz);
+    d.y=heightAt(d.x,d.z);
+  }
+
+  function damagePlayer(amount){
+    if(isSafeZone(player.x,player.z))return;
+    player.hp=clamp(player.hp-amount,0,100);
+    if(player.hp<=0){
+      player.hp=70;
+      player.x=0;
+      player.z=0;
+      player.y=heightAt(0,0);
+      player.hunger=Math.max(35,player.hunger);
+      player.thirst=Math.max(35,player.thirst);
+      notice('You made it back to camp.');
+    }
+    updateStats();
+  }
+
+  function isSafeZone(x,z){
+    return Math.hypot(x,z)<17;
+  }
+
+  function updatePlayer(dt){
+    let mx=0,mz=0;
+    if(keys.has('KeyW'))mz+=1;
+    if(keys.has('KeyS'))mz-=1;
+    if(keys.has('KeyA'))mx-=1;
+    if(keys.has('KeyD'))mx+=1;
+
+    const moving=mx!==0||mz!==0;
+    const sprint=keys.has('ShiftLeft')||keys.has('ShiftRight');
+    const canSprint=sprint&&moving&&player.stamina>8&&!player.riding;
+    let speed=player.riding?(species[mounted.type].speed*1.25):canSprint?8.5:4.7;
+
+    if(player.riding){
+      speed=species[mounted.type].speed*1.25;
+    }
+
+    if(moving){
+      const len=Math.hypot(mx,mz)||1;
+      mx/=len;mz/=len;
+
+      const sy=Math.sin(player.yaw),cy=Math.cos(player.yaw);
+      const wx=mx*cy+mz*sy;
+      const wz=mz*cy-mx*sy;
+
+      player.x+=wx*speed*dt;
+      player.z+=wz*speed*dt;
+
+      if(player.riding&&mounted){
+        mounted.x=player.x-Math.sin(player.yaw)*1.2;
+        mounted.z=player.z-Math.cos(player.yaw)*1.2;
+        mounted.y=heightAt(mounted.x,mounted.z);
+        mounted.yaw=player.yaw;
+      }
+
+      if(canSprint)player.stamina=clamp(player.stamina-dt*17,0,100);
+      else player.stamina=clamp(player.stamina+dt*11,0,100);
+    }else{
+      player.stamina=clamp(player.stamina+dt*13,0,100);
+    }
+
+    if(keys.has('Space')&&!player.jumpLock&&player.y<=heightAt(player.x,player.z)+.06){
+      player.vy=6.5;
+      player.jumpLock=true;
+    }
+    if(!keys.has('Space'))player.jumpLock=false;
+
+    player.vy-=18*dt;
+    player.y+=player.vy*dt;
+
+    const floor=heightAt(player.x,player.z);
+    if(player.y<floor){
+      player.y=floor;
+      player.vy=0;
+    }
+
+    player.x=clamp(player.x,-124,124);
+    player.z=clamp(player.z,-124,124);
+
+    player.hunger=clamp(player.hunger-dt*.10,0,100);
+    player.thirst=clamp(player.thirst-dt*.16,0,100);
+
+    if(player.hunger<10||player.thirst<10){
+      player.hp=clamp(player.hp-dt*1.2,0,100);
+    }else{
+      player.hp=clamp(player.hp+dt*.04,0,100);
+    }
+
+    if(player.riding&&mounted){
+      mounted.x=player.x-Math.sin(player.yaw)*1.2;
+      mounted.z=player.z-Math.cos(player.yaw)*1.2;
+      mounted.y=heightAt(mounted.x,mounted.z);
+    }
+
+    if(player.hp<=0)damagePlayer(0);
+
+    updateStats();
+  }
+
+  function eat(){
+    if(player.berries>0){
+      player.berries--;
+      player.hunger=clamp(player.hunger+18,0,100);
+      notice('You ate berries.');
+      updateHotbar();
+    }else if(player.meat>0){
+      player.meat--;
+      player.hunger=clamp(player.hunger+35,0,100);
+      notice('You ate cooked meat.');
+      updateHotbar();
+    }else{
+      notice('You have no food.');
+    }
+  }
+
+  function drink(){
+    if(player.water>0){
+      player.water--;
+      player.thirst=clamp(player.thirst+35,0,100);
+      notice('You drank water.');
+      updateHotbar();
+    }else{
+      notice('You need to collect water first.');
+    }
+  }
+
+  function updateStats(){
+    document.getElementById('hpBar').style.width=player.hp+'%';
+    document.getElementById('stBar').style.width=player.stamina+'%';
+    document.getElementById('foodBar').style.width=player.hunger+'%';
+    document.getElementById('waterBar').style.width=player.thirst+'%';
+    const temp=clamp(100-Math.abs(player.temp-50)*1.7,0,100);
+    document.getElementById('tempBar').style.width=temp+'%';
+    document.getElementById('hpTxt').textContent=Math.round(player.hp);
+    document.getElementById('level').textContent='LV '+player.level;
+  }
+
+  function updateQuest(){
+    const q=questList[questIndex];
+    if(!q)return;
+
+    const current=Math.min(q.target,q.get());
+    document.getElementById('questTitle').textContent=q.title;
+    document.getElementById('questDesc').textContent=q.desc;
+    document.getElementById('questCount').textContent=current+' / '+q.target;
+    document.getElementById('questBar').style.width=(current/q.target*100)+'%';
+
+    if(current>=q.target){
+      notice('Quest complete: '+q.title);
+      player.xp+=50;
+      questIndex++;
+      if(questIndex>=questList.length){
+        questIndex=questList.length-1;
+      }
+      const next=questList[questIndex];
+      document.getElementById('questTitle').textContent=next.title;
+      document.getElementById('questDesc').textContent=next.desc;
+      updateQuest();
+    }
+  }
+
+  function addXP(amount){
+    player.xp+=amount;
+    while(player.xp>=player.nextXP){
+      player.xp-=player.nextXP;
+      player.level++;
+      player.nextXP=Math.round(player.nextXP*1.28);
+      player.hp=100;
+      player.stamina=100;
+      notice('LEVEL UP! You are now level '+player.level+'.');
+    }
+    updateStats();
+  }
+
+  function notice(msg){
+    const el=document.createElement('div');
+    el.className='notice';
+    el.textContent=msg;
+    document.getElementById('notices').appendChild(el);
+    setTimeout(()=>el.remove(),3300);
+  }
+
+  function updatePrompt(){
+    let text='Explore the valley.';
+    const d=nearestDino(7);
+    if(d){
+      text=d.wild?'E — Feed / interact with '+d.name:'E — Interact with '+d.name;
+    }else{
+      let r=null,rd=4.5;
+      for(const x of scene.resources){
+        if(!x.active)continue;
+        const dd=Math.hypot(x.x-player.x,x.z-player.z);
+        if(dd<rd){r=x;rd=dd}
+      }
+      if(r)text='E — Gather '+r.type;
+      for(const f of scene.farms){
+        if(Math.hypot(f.x-player.x,f.z-player.z)<4)text=f.ready?'E — Harvest garden':'E — Plant / check garden';
+      }
+    }
+    if(scene.buildMode)text='BUILD MODE — Click to place • 1–4 choose structure • ESC cancel';
+    document.getElementById('prompt').textContent=text;
+  }
+
+  function updateZone(){
+    const x=player.x,z=player.z;
+    let zone='Verdant Basin';
+    if(z<-65)zone='Coastal Wetlands';
+    else if(x>65&&z>35)zone='Redwood Highlands';
+    else if(x<-65)zone='Amber Desert';
+    else if(z>70)zone='Frostback Peaks';
+    else if(x>45&&z<-35)zone='Volcanic Reach';
+    else if(Math.hypot(x,z)>80)zone='Wild Frontier';
+    document.getElementById('zone').textContent=zone;
+  }
+
+  function updateResources(){
+    for(const r of scene.resources){
+      if(!r.active&&scene.time>r.respawn)r.active=true;
+    }
+    for(const f of scene.farms){
+      if(f.planted&&!f.ready&&scene.time>=f.readyAt)f.ready=true;
+    }
+  }
+
+  function toggleBuild(force){
+    scene.buildMode=force===undefined?!scene.buildMode:force;
+    if(scene.buildMode){
+      if(!document.getElementById('buildHud')){
+        const div=document.createElement('div');
+        div.id='buildHud';
+        div.className='build-hud';
+        div.innerHTML='<b>BUILD MODE</b><span id="buildName">Campfire</span><small>1–4 choose • click place • ESC cancel</small>';
+        document.getElementById('hud').appendChild(div);
+      }
+      updateBuildHUD();
+      notice('Build mode activated.');
+    }else{
+      document.getElementById('buildHud')?.remove();
+    }
+  }
+
+  const buildTypes=[
+    {type:'campfire',name:'Campfire',cost:{wood:8,stone:4}},
+    {type:'wall',name:'Wood Wall',cost:{wood:12}},
+    {type:'floor',name:'Wood Floor',cost:{wood:10}},
+    {type:'garden',name:'Garden',cost:{wood:6,clay:4,fiber:3}}
+  ];
+
+  function updateBuildHUD(){
+    if(!scene.buildMode)return;
+    const b=buildTypes[scene.buildChoice];
+    const el=document.getElementById('buildName');
+    if(el)el.textContent=b.name;
+  }
+
+  function canAfford(cost){
+    return Object.entries(cost).every(([k,v])=>(player[k]||0)>=v);
+  }
+
+  function spend(cost){
+    for(const [k,v] of Object.entries(cost))player[k]-=v;
+  }
+
+  function placeBuild(){
+    if(!scene.buildMode)return;
+    const b=buildTypes[scene.buildChoice];
+    if(!canAfford(b.cost)){
+      notice('Not enough resources for '+b.name+'.');
+      return;
+    }
+    const dist=4.2;
+    const x=player.x+Math.sin(player.yaw)*dist;
+    const z=player.z+Math.cos(player.yaw)*dist;
+    const y=heightAt(x,z);
+    const obj={type:b.type,x,y,z,rot:Math.round(player.yaw/(Math.PI/2))*Math.PI/2};
+    spend(b.cost);
+    scene.builds.push(obj);
+    if(b.type==='garden'){
+      scene.farms.push({x,y,z,rot:obj.rot,planted:false,ready:false,readyAt:0,harvests:0});
+    }
+    player.xp+=12;
+    notice('Built '+b.name+'.');
+    updateHotbar();
+    saveGame();
+  }
+
+  function toggleModal(id){
+    const m=document.getElementById(id);
+    if(!m)return;
+    m.classList.toggle('hidden');
+    if(id==='invModal')renderInventory();
+    if(id==='mapModal')renderMap();
+  }
+
+  function renderInventory(){
+    const box=document.getElementById('inventoryGrid');
+    if(!box)return;
+    const items=['wood','stone','fiber','clay','crystal','berries','water','meat'];
+    box.innerHTML=items.map(k=>`<div class="item"><span>${k.toUpperCase()}</span><b>${player[k]||0}</b></div>`).join('');
+    document.getElementById('craftLevel').textContent='Crafting level '+player.craftLevel;
+  }
+
+  function renderMap(){
+    const c=document.getElementById('mapCanvas');
+    if(!c)return;
+    const ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle='#0a1515';ctx.fillRect(0,0,c.width,c.height);
+    ctx.strokeStyle='rgba(185,242,124,.14)';
+    for(let i=0;i<12;i++){ctx.beginPath();ctx.moveTo(i*50,0);ctx.lineTo(i*50,c.height);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*50);ctx.lineTo(c.width,i*50);ctx.stroke();}
+    const scale=3.7,ox=c.width/2-player.x*scale,oz=c.height/2-player.z*scale;
+    ctx.fillStyle='rgba(35,80,50,.8)';
+    ctx.beginPath();ctx.arc(ox,oz,10,0,TAU);ctx.fill();
+    for(const o of scene.objects){
+      if(o.kind!=='landmark')continue;
+      const x=ox+o.x*scale,z=oz+o.z*scale;
+      if(x<0||x>c.width||z<0||z>c.height)continue;
+      ctx.fillStyle=o.seen?'#b9f27c':'#64746d';
+      ctx.fillRect(x-4,z-4,8,8);
+    }
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(c.width/2,c.height/2,5,0,TAU);ctx.fill();
+  }
+
+  function updateHotbar(){
+    const items=[
+      ['1','🪓','wood'],
+      ['2','◈','stone'],
+      ['3','●','berries'],
+      ['4','◆','crystal'],
+      ['5','✦','fiber'],
+      ['6','≈','water'],
+      ['7','◉','meat']
+    ];
+    document.getElementById('hotbar').innerHTML=items.map(([n,icon,k])=>`<div class="slot ${selectedHot===k?'sel':''}" data-item="${k}"><small>${n}</small>${icon}<b>${player[k]||0}</b></div>`).join('');
+    document.querySelectorAll('.slot').forEach(s=>s.onclick=()=>{selectedHot=s.dataset.item;updateHotbar()});
+  }
+
+  function craft(item){
+    const recipes={
+      campfire:{wood:8,stone:4},
+      saddle:{hide:10,fiber:12,wood:5},
+      fence:{wood:12},
+      garden:{wood:6,clay:4,fiber:3},
+      beacon:{crystal:3,stone:8}
+    };
+    const cost=recipes[item];
+    if(!cost)return;
+    if(!canAfford(cost)){notice('Missing materials.');return}
+    spend(cost);
+    if(item==='campfire'||item==='fence'||item==='garden'||item==='beacon'){
+      const type=item==='fence'?'fence':item;
+      const dist=4;
+      const x=player.x+Math.sin(player.yaw)*dist,z=player.z+Math.cos(player.yaw)*dist,y=heightAt(x,z);
+      scene.builds.push({type,x,y,z,rot:Math.round(player.yaw/(Math.PI/2))*Math.PI/2});
+      if(type==='garden')scene.farms.push({x,y,z,rot:0,planted:false,ready:false,readyAt:0,harvests:0});
+    }
+    if(item==='saddle')player.saddles++;
+    player.xp+=25;
+    notice('Crafted '+item+'.');
+    renderInventory();updateHotbar();saveGame();
+  }
+          const species={
+    rex:{name:'T-Rex',size:1.35,hp:180,speed:3.0,damage:12,aggressive:true,herbivore:false,color:[.36,.20,.12],accent:[.55,.28,.12]},
+    raptor:{name:'Raptor',size:.78,hp:75,speed:5.1,damage:7,aggressive:true,herbivore:false,color:[.24,.34,.25],accent:[.42,.52,.28]},
+    trike:{name:'Triceratops',size:1.25,hp:210,speed:2.5,damage:10,aggressive:false,herbivore:true,color:[.40,.44,.34],accent:[.66,.61,.42]},
+    stego:{name:'Stegosaurus',size:1.1,hp:170,speed:2.1,damage:8,aggressive:false,herbivore:true,color:[.25,.42,.27],accent:[.56,.38,.18]},
+    anky:{name:'Ankylosaurus',size:1.0,hp:190,speed:1.8,damage:9,aggressive:false,herbivore:true,color:[.30,.37,.29],accent:[.50,.34,.18]},
+    carno:{name:'Carnotaurus',size:1.05,hp:130,speed:4.0,damage:10,aggressive:true,herbivore:false,color:[.42,.19,.16],accent:[.66,.25,.17]},
+    ptera:{name:'Pteranodon',size:.82,hp:70,speed:4.5,damage:5,aggressive:false,herbivore:false,color:[.30,.27,.40],accent:[.55,.38,.56]},
+    dodo:{name:'Dodo',size:.48,hp:35,speed:2.2,damage:1,aggressive:false,herbivore:true,color:[.45,.36,.23],accent:[.75,.60,.25]},
+    titan:{name:'Elder Titan',size:2.0,hp:900,speed:2.8,damage:18,aggressive:true,herbivore:false,boss:true,color:[.18,.15,.22],accent:[.72,.23,.18]}
+  };
+
+  const Mat={
+    identity(){
+      return new Float32Array([
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+      ]);
+    },
+    mul(a,b){
+      const o=new Float32Array(16);
+      for(let c=0;c<4;c++)for(let r=0;r<4;r++){
+        o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];
+      }
+      return o;
+    },
+    perspective(fov,aspect,near,far){
+      const f=1/Math.tan(fov/2),nf=1/(near-far);
+      const o=new Float32Array(16);
+      o[0]=f/aspect;o[5]=f;o[10]=(far+near)*nf;o[11]=-1;o[14]=2*far*near*nf;
+      return o;
+    },
+    look(eye,target,up=[0,1,0]){
+      let zx=eye[0]-target[0],zy=eye[1]-target[1],zz=eye[2]-target[2];
+      let l=Math.hypot(zx,zy,zz)||1;zx/=l;zy/=l;zz/=l;
+      let xx=up[1]*zz-up[2]*zy,xy=up[2]*zx-up[0]*zz,xz=up[0]*zy-up[1]*zx;
+      l=Math.hypot(xx,xy,xz)||1;xx/=l;xy/=l;xz/=l;
+      const yx=zy*xz-zz*xy,yy=zz*xx-zx*xz,yz=zx*xy-zy*xx;
+      return new Float32Array([
+        xx,yx,zx,0,
+        xy,yy,zy,0,
+        xz,yz,zz,0,
+        -(xx*eye[0]+xy*eye[1]+xz*eye[2]),
+        -(yx*eye[0]+yy*eye[1]+yz*eye[2]),
+        -(zx*eye[0]+zy*eye[1]+zz*eye[2]),1
+      ]);
+    },
+    trs(p,r,s){
+      const cx=Math.cos(r[0]),sx=Math.sin(r[0]),cy=Math.cos(r[1]),sy=Math.sin(r[1]),cz=Math.cos(r[2]),sz=Math.sin(r[2]);
+      const x=s[0],y=s[1],z=s[2];
+      return new Float32Array([
+        (cy*cz)*x,(sx*sy*cz+cx*sz)*x,(sx*sz-cx*sy*cz)*x,0,
+        (-cy*sz)*y,(-sx*sy*sz+cx*cz)*y,(sx*cz+cx*sy*sz)*y,0,
+        sy*z,(-sx*cy)*z,(cx*cy)*z,0,
+        p[0],p[1],p[2],1
+      ]);
+    },
+    mulVecY(p,yaw,forward,side){
+      return {x:p.x+Math.sin(yaw)*forward+Math.cos(yaw)*side,y:p.y,z:p.z+Math.cos(yaw)*forward-Math.sin(yaw)*side};
+    }
+  };
+
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const wrnd=rnd;
+  const wpick=a=>a[(Math.random()*a.length)|0];
+
+  function heightAt(x,z){
+    const broad=Math.sin(x*.055)*1.6+Math.cos(z*.05)*1.3;
+    const hills=Math.sin(x*.12+z*.08)*.9+Math.cos(x*.08-z*.10)*.8;
+    const ridges=Math.sin((x+z)*.035)*Math.cos((x-z)*.045)*2.0;
+    let h=broad+hills+ridges;
+    const d=Math.hypot(x,z);
+    h*=clamp(d/15,0,1);
+    if(z<-75)h*=.55;
+    if(x<-72)h+=Math.sin(z*.08)*.5;
+    if(x>55&&z>35)h+=2.0;
+    if(z>75)h+=Math.max(0,(z-75)*.11);
+    return h;
+  }
+
+  const canvas=document.getElementById('game');
+  let gl=null;
+  let webglVersion=2;
+
+  try{
+    gl=canvas.getContext('webgl2',{antialias:true,alpha:false,preserveDrawingBuffer:false});
+  }catch(e){gl=null}
+
+  if(!gl){
+    try{
+      gl=canvas.getContext('webgl',{antialias:true,alpha:false})||
+         canvas.getContext('experimental-webgl',{antialias:true,alpha:false});
+      webglVersion=1;
+    }catch(e){gl=null}
+  }
+
+  if(!gl){
+    const fatal=document.getElementById('fatal');
+    if(fatal)fatal.classList.remove('hidden');
+    throw new Error('WebGL is not available in this browser.');
+  }
+
+  const VERT2=`#version 300 es
+  in vec3 aPosition;
+  in vec3 aNormal;
+  uniform mat4 uProjection;
+  uniform mat4 uView;
+  uniform mat4 uModel;
+  uniform vec4 uColor;
+  uniform int uTerrain;
+  out vec3 vNormal;
+  out vec3 vWorld;
+  out vec4 vColor;
+  void main(){
+    vec4 world=uModel*vec4(aPosition,1.0);
+    vWorld=world.xyz;
+    vNormal=mat3(uModel)*aNormal;
+    vColor=uColor;
+    gl_Position=uProjection*uView*world;
+  }`;
+
+  const FRAG2=`#version 300 es
+  precision highp float;
+  in vec3 vNormal;
+  in vec3 vWorld;
+  in vec4 vColor;
+  out vec4 outColor;
+  void main(){
+    vec3 n=normalize(vNormal);
+    vec3 light=normalize(vec3(-.4,1.0,.3));
+    float d=max(dot(n,light),0.0);
+    float rim=pow(1.0-max(dot(n,normalize(vec3(0,0,1))),0.0),2.0);
+    float fog=clamp((length(vWorld.xz)-40.0)/125.0,0.0,1.0);
+    vec3 col=vColor.rgb*(.48+d*.58)+rim*.035;
+    col=mix(col,vec3(.08,.13,.12),fog*.55);
+    outColor=vec4(col,vColor.a);
+  }`;
+
+  const VERT1=`
+  attribute vec3 aPosition;
+  attribute vec3 aNormal;
+  uniform mat4 uProjection;
+  uniform mat4 uView;
+  uniform mat4 uModel;
+  uniform vec4 uColor;
+  varying vec3 vNormal;
+  varying vec3 vWorld;
+  varying vec4 vColor;
+  void main(){
+    vec4 world=uModel*vec4(aPosition,1.0);
+    vWorld=world.xyz;
+    vNormal=mat3(uModel)*aNormal;
+    vColor=uColor;
+    gl_Position=uProjection*uView*world;
+  }`;
+
+  const FRAG1=`
+  precision mediump float;
+  varying vec3 vNormal;
+  varying vec3 vWorld;
+  varying vec4 vColor;
+  void main(){
+    vec3 n=normalize(vNormal);
+    vec3 light=normalize(vec3(-.4,1.0,.3));
+    float d=max(dot(n,light),0.0);
+    float fog=clamp((length(vWorld.xz)-40.0)/125.0,0.0,1.0);
+    vec3 col=vColor.rgb*(.48+d*.58);
+    col=mix(col,vec3(.08,.13,.12),fog*.55);
+    gl_FragColor=vec4(col,vColor.a);
+  }`;
+
+  function compile(type,src){
+    const s=gl.createShader(type);
+    gl.shaderSource(s,src);
+    gl.compileShader(s);
+    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
+      const msg=gl.getShaderInfoLog(s)||'shader error';
+      gl.deleteShader(s);
+      throw new Error(msg);
+    }
+    return s;
+  }
+
+  const program=gl.createProgram();
+  gl.attachShader(program,compile(gl.VERTEX_SHADER,webglVersion===2?VERT2:VERT1));
+  gl.attachShader(program,compile(gl.FRAGMENT_SHADER,webglVersion===2?FRAG2:FRAG1));
+  gl.linkProgram(program);
+
+  if(!gl.getProgramParameter(program,gl.LINK_STATUS)){
+    throw new Error(gl.getProgramInfoLog(program)||'program link failed');
+  }
+
+  gl.useProgram(program);
+
+  const U={
+    projection:gl.getUniformLocation(program,'uProjection'),
+    view:gl.getUniformLocation(program,'uView'),
+    model:gl.getUniformLocation(program,'uModel'),
+    color:gl.getUniformLocation(program,'uColor'),
+    terrain:gl.getUniformLocation(program,'uTerrain')
+  };
+
+  const A={
+    position:gl.getAttribLocation(program,'aPosition'),
+    normal:gl.getAttribLocation(program,'aNormal')
+  };
+
+  const MESH={};
+
+  function createMesh(vertices,indices){
+    const vao=gl.createVertexArray?gl.createVertexArray():null;
+
+    if(vao)gl.bindVertexArray(vao);
+
+    const vb=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,vb);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(vertices),gl.STATIC_DRAW);
+
+    gl.enableVertexAttribArray(A.position);
+    gl.vertexAttribPointer(A.position,3,gl.FLOAT,false,24,0);
+
+    gl.enableVertexAttribArray(A.normal);
+    gl.vertexAttribPointer(A.normal,3,gl.FLOAT,false,24,12);
+
+    const ib=gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);
+
+    if(vao)gl.bindVertexArray(null);
+
+    return {vao,vb,ib,count:indices.length};
+  }
+
+  function cube(){
+    const v=[];
+    const f=[
+      [-1,0,0],[1,0,0],[0,-1,0],[0,1,0],[0,0,-1],[0,0,1]
+    ];
+    const faces=[
+      [[-1,-1,-1],[-1,1,-1],[-1,1,1],[-1,-1,1]],
+      [[1,-1,1],[1,1,1],[1,1,-1],[1,-1,-1]],
+      [[-1,-1,1],[1,-1,1],[1,-1,-1],[-1,-1,-1]],
+      [[-1,1,-1],[1,1,-1],[1,1,1],[-1,1,1]],
+      [[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,-1]],
+      [[-1,-1,1],[-1,1,1],[1,1,1],[1,-1,1]]
+    ];
+    for(let i=0;i<6;i++){
+      const n=f[i];
+      for(const p of faces[i])v.push(p[0],p[1],p[2],n[0],n[1],n[2]);
+    }
+    const ind=[];
+    for(let i=0;i<6;i++){
+      const j=i*4;
+      ind.push(j,j+1,j+2,j,j+2,j+3);
+    }
+    return createMesh(v,ind);
+  }
+
+  function sphere(){
+    const v=[],ind=[];
+    const lat=14,lon=20;
+    for(let y=0;y<=lat;y++){
+      const a=y/lat*Math.PI;
+      const sy=Math.cos(a),sr=Math.sin(a);
+      for(let x=0;x<=lon;x++){
+        const b=x/lon*TAU;
+        const px=Math.cos(b)*sr,py=sy,pz=Math.sin(b)*sr;
+        v.push(px,py,pz,px,py,pz);
+      }
+    }
+    for(let y=0;y<lat;y++){
+      for(let x=0;x<lon;x++){
+        const a=y*(lon+1)+x,b=a+lon+1;
+        ind.push(a,b,a+1,b,b+1,a+1);
+      }
+    }
+    return createMesh(v,ind);
+  }
+
+  function cone(){
+    const v=[],ind=[],seg=20;
+    v.push(0,1,0,0,1,0);
+    for(let i=0;i<seg;i++){
+      const a=i/seg*TAU;
+      v.push(Math.cos(a),-1,Math.sin(a),Math.cos(a),0,Math.sin(a));
+    }
+    for(let i=0;i<seg;i++)ind.push(0,1+i,1+(i+1)%seg);
+    return createMesh(v,ind);
+  }
+
+  function terrainMesh(){
+    const N=72,size=150;
+    const v=[],ind=[];
+    for(let z=0;z<=N;z++){
+      for(let x=0;x<=N;x++){
+        const px=-size+2*size*x/N;
+        const pz=-size+2*size*z/N;
+        const py=heightAt(px,pz);
+        const e=.35;
+        const nx=heightAt(px-e,pz)-heightAt(px+e,pz);
+        const nz=heightAt(px,pz-e)-heightAt(px,pz+e);
+        const n=Math.hypot(nx,2,nz);
+        v.push(px,py,pz,nx/n,2/n,nz/n);
+      }
+    }
+    for(let z=0;z<N;z++){
+      for(let x=0;x<N;x++){
+        const a=z*(N+1)+x,b=a+1,c=a+N+1,d=c+1;
+        ind.push(a,c,b,b,c,d);
+      }
+    }
+    return createMesh(v,ind);
+  }
+
+  MESH.box=cube();
+  MESH.sphere=sphere();
+  MESH.cone=cone();
+  MESH.terrain=terrainMesh();
+
+  function bindMesh(mesh){
+    if(mesh.vao&&gl.bindVertexArray){
+      gl.bindVertexArray(mesh.vao);
+    }else{
+      gl.bindBuffer(gl.ARRAY_BUFFER,mesh.vb);
+      gl.enableVertexAttribArray(A.position);
+      gl.vertexAttribPointer(A.position,3,gl.FLOAT,false,24,0);
+      gl.enableVertexAttribArray(A.normal);
+      gl.vertexAttribPointer(A.normal,3,gl.FLOAT,false,24,12);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mesh.ib);
+    }
+  }
+
+  function draw(kind,pos,scale,color,rot=[0,0,0],terrain=0){
+    const mesh=MESH[kind]||MESH.box;
+    bindMesh(mesh);
+    const model=Mat.trs([pos.x,pos.y,pos.z],rot,scale);
+    gl.uniformMatrix4fv(U.model,false,model);
+    gl.uniform4f(U.color,color[0],color[1],color[2],color.length>3?color[3]:1);
+    if(U.terrain)gl.uniform1i(U.terrain,terrain?1:0);
+    gl.drawElements(gl.TRIANGLES,mesh.count,webglVersion===2?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT,0);
+  }
+
+  /* WebGL1 needs 16-bit indices. Rebuild meshes when necessary. */
+  if(webglVersion===1){
+    function convertMesh(mesh){
+      if(!mesh)return;
+      const old=mesh;
+      const vao=gl.createVertexArray?gl.createVertexArray():null;
+      if(vao)gl.bindVertexArray(vao);
+      gl.bindBuffer(gl.ARRAY_BUFFER,old.vb);
+      gl.enableVertexAttribArray(A.position);
+      gl.vertexAttribPointer(A.position,3,gl.FLOAT,false,24,0);
+      gl.enableVertexAttribArray(A.normal);
+      gl.vertexAttribPointer(A.normal,3,gl.FLOAT,false,24,12);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,old.ib);
+      if(vao)gl.bindVertexArray(null);
+    }
+  }
+
+  const scene={
+    time:0,
+    running:false,
+    buildMode:false,
+    buildChoice:0,
+    builds:[],
+    farms:[],
+    dinos:[],
+    objects:[],
+    resources:[],
+    remotePlayers:{}
+  };
+
+  const player={
+    name:'Explorer',
+    x:0,
+    y:heightAt(0,0),
+    z:0,
+    yaw:0,
+    pitch:-.08,
+    vy:0,
+    hp:100,
+    stamina:100,
+    hunger:100,
+    thirst:100,
+    temp:50,
+    level:1,
+    xp:0,
+    nextXP:100,
+    wood:0,
+    stone:0,
+    fiber:0,
+    clay:0,
+    crystal:0,
+    berries:5,
+    water:0,
+    meat:0,
+    hide:0,
+    saddles:0,
+    craftLevel:1,
+    tames:[],
+    discoveries:{},
+    riding:false,
+    jumpLock:false
+  };
+
+  let selectedDino=null;
+  let mounted=null;
+  let selectedHot='wood';
+
+  function resize(){
+    const dpr=Math.min(devicePixelRatio||1,1.7);
+    canvas.width=Math.floor(innerWidth*dpr);
+    canvas.height=Math.floor(innerHeight*dpr);
+    gl.viewport(0,0,canvas.width,canvas.height);
+  }
+  addEventListener('resize',resize);
+  resize();
+
+  function camera(){
+    const dist=player.riding?5.2:6.5;
+    const height=player.riding?2.7:2.8;
+    const target={
+      x:player.x+Math.sin(player.yaw)*dist,
+      y:player.y+height+Math.sin(player.pitch)*dist,
+      z:player.z+Math.cos(player.yaw)*dist
+    };
+    const eye={
+      x:player.x-Math.sin(player.yaw)*dist,
+      y:player.y+height-Math.sin(player.pitch)*dist*.65,
+      z:player.z-Math.cos(player.yaw)*dist
+    };
+    return {eye,target};
+  }
+
+  function render(){
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.clearColor(.055,.10,.095,1);
+    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+
+    const cam=camera();
+    const projection=Mat.perspective(Math.PI/3,canvas.width/canvas.height,.1,350);
+    const view=Mat.look([cam.eye.x,cam.eye.y,cam.eye.z],[cam.target.x,cam.target.y,cam.target.z]);
+
+    gl.useProgram(program);
+    gl.uniformMatrix4fv(U.projection,false,projection);
+    gl.uniformMatrix4fv(U.view,false,view);
+
+    drawWorld();
+  }
+
+  function updateCamera(dt){
+    player.yaw+=mouseDX*.0025;
+    player.pitch+=mouseDY*.0025;
+    mouseDX=0;
+    mouseDY=0;
+    player.pitch=clamp(player.pitch,-1.1,.7);
+  }
+
+  function saveGame(){
+    const data={
+      player:{
+        ...player,
+        tames:player.tames.slice(),
+        discoveries:{...player.discoveries}
+      },
+      builds:scene.builds,
+      farms:scene.farms,
+      dinos:scene.dinos.map(d=>({...d}))
+    };
+    localStorage.setItem('dinoFrontierSave',JSON.stringify(data));
+    notice('World saved.');
+  }
+
+  function loadGame(){
+    try{
+      const raw=localStorage.getItem('dinoFrontierSave');
+      if(!raw)return;
+      const data=JSON.parse(raw);
+      if(data.player)Object.assign(player,data.player);
+      if(Array.isArray(data.builds))scene.builds=data.builds;
+      if(Array.isArray(data.farms))scene.farms=data.farms;
+      if(Array.isArray(data.dinos)&&data.dinos.length){
+        scene.dinos=data.dinos.map(d=>{
+          d.cool=0;
+          return d;
+        });
+      }
+    }catch(e){
+      console.warn('Save load failed',e);
+    }
+  }
+
+  function startGame(){
+    document.getElementById('start').classList.add('hidden');
+    document.getElementById('hud').classList.remove('hidden');
+
+    player.name=(document.getElementById('name').value||'Explorer').trim().slice(0,16)||'Explorer';
+    player.y=heightAt(player.x,player.z);
+
+    scene.running=true;
+
+    updateHotbar();
+    updateStats();
+    updateQuest();
+    updateZone();
+
+    if(!localStorage.getItem('dinoFrontierSeenTutorial')){
+      document.getElementById('tutorialModal').classList.remove('hidden');
+      localStorage.setItem('dinoFrontierSeenTutorial','1');
+    }
+
+    if(canvas.requestPointerLock){
+      notice('Click the world to capture the mouse.');
+    }
+
+    saveGame();
+  }
+
+  window.playDinoSolo=()=>{
+    startGame();
+  };
+
+  async function setupHost(){
+    const name=(document.getElementById('name').value||'Explorer').trim();
+    const status=document.getElementById('netStatus');
+    status.textContent='Starting multiplayer host...';
+
+    try{
+      await loadPeerJS();
+      const id='dino-'+Math.random().toString(36).slice(2,8);
+      const peer=new Peer(id);
+
+      peer.on('open',roomId=>{
+        document.getElementById('roomOut').textContent=roomId;
+        document.getElementById('roomChip').classList.remove('hidden');
+        status.textContent='Room created: '+roomId;
+        window.dinoPeer=peer;
+        window.dinoHost=true;
+        startGame();
+        notice('Share room code '+roomId+' with your friend.');
+      });
+
+      peer.on('connection',conn=>{
+        conn.on('open',()=>{
+          window.dinoConnections=window.dinoConnections||[];
+          window.dinoConnections.push(conn);
+          conn.send({type:'hello',name:player.name});
+          notice('A player joined your world.');
+        });
+        conn.on('data',data=>handleNetwork(data,conn));
+      });
+
+      peer.on('error',err=>{
+        console.warn(err);
+        status.textContent='Multiplayer connection failed. Try Play Solo.';
+        notice('Multiplayer failed — solo mode is still available.');
+      });
+    }catch(e){
+      status.textContent='Could not load multiplayer. Try Play Solo.';
+      notice('Multiplayer unavailable right now.');
+    }
+  }
+
+  async function setupJoin(roomId){
+    roomId=(roomId||'').trim();
+    if(!roomId){
+      document.getElementById('netStatus').textContent='Enter a host room code first.';
+      return;
+    }
+
+    const status=document.getElementById('netStatus');
+    status.textContent='Connecting to '+roomId+'...';
+
+    try{
+      await loadPeerJS();
+      const peer=new Peer();
+
+      peer.on('open',()=>{
+        const conn=peer.connect(roomId);
+        window.dinoPeer=peer;
+        window.dinoConnection=conn;
+
+        conn.on('open',()=>{
+          conn.send({type:'hello',name:player.name});
+          status.textContent='Connected!';
+          document.getElementById('roomOut').textContent=roomId;
+          document.getElementById('roomChip').classList.remove('hidden');
+          startGame();
+          notice('Connected to the host world.');
+        });
+
+        conn.on('data',data=>handleNetwork(data,conn));
+
+        conn.on('close',()=>{
+          notice('Connection closed.');
+        });
+      });
+
+      peer.on('error',()=>{
+        status.textContent='Could not connect. Check the room code.';
+      });
+    }catch(e){
+      status.textContent='Multiplayer could not load. Try Play Solo.';
+    }
+  }
+
+  function loadPeerJS(){
+    if(window.Peer)return Promise.resolve();
+
+    return new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+      s.onload=()=>resolve();
+      s.onerror=()=>reject(new Error('PeerJS failed to load'));
+      document.head.appendChild(s);
+    });
+  }
+
+  function networkSend(data){
+    if(window.dinoHost){
+      for(const c of (window.dinoConnections||[])){
+        try{c.send(data)}catch(e){}
+      }
+    }else if(window.dinoConnection){
+      try{window.dinoConnection.send(data)}catch(e){}
+    }
+  }
+
+  function handleNetwork(data,conn){
+    if(!data)return;
+
+    if(data.type==='hello'){
+      scene.remotePlayers[data.id||Math.random()]={name:data.name||'Explorer',x:0,y:0,z:0,yaw:0};
+      playersUI();
+      return;
+    }
+
+    if(data.type==='player'){
+      if(data.id){
+        scene.remotePlayers[data.id]=data.player;
+      }
+      playersUI();
+    }
+
+    if(data.type==='world'){
+      if(Array.isArray(data.dinos))scene.dinos=data.dinos;
+      if(Array.isArray(data.builds))scene.builds=data.builds;
+      if(Array.isArray(data.farms))scene.farms=data.farms;
+    }
+  }
+
+  function playersUI(){
+    const count=Object.keys(scene.remotePlayers).length+1;
+    document.getElementById('players').innerHTML='<b>'+count+'</b> PLAYER'+(count===1?'':'S')+' ONLINE';
+  }
+
+  let last=performance.now();
+
+  function loop(now){
+    const dt=Math.min(.033,(now-last)/1000);
+    last=now;
+
+    if(scene.running){
+      scene.time+=dt;
+      updateCamera(dt);
+      updatePlayer(dt);
+      updateDinos(dt);
+      updateResources();
+      updatePrompt();
+      updateZone();
+
+      networkSend({
+        type:'player',
+        id:player.name,
+        player:{
+          name:player.name,
+          x:player.x,
+          y:player.y,
+          z:player.z,
+          yaw:player.yaw
+        }
+      });
+
+      render();
+    }else{
+      render();
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  document.getElementById('soloBtn').addEventListener('click',()=>startGame());
+  document.getElementById('hostBtn').addEventListener('click',()=>setupHost());
+  document.getElementById('joinBtn').addEventListener('click',()=>setupJoin(document.getElementById('room').value));
+
+  document.getElementById('mapBtn').onclick=()=>toggleModal('mapModal');
+  document.getElementById('invBtn').onclick=()=>toggleModal('invModal');
+  document.getElementById('saveBtn').onclick=saveGame;
+
+  document.getElementById('tutorialBtn').onclick=()=>document.getElementById('tutorialModal').classList.remove('hidden');
+
+  document.querySelectorAll('[data-tutorial-close]').forEach(b=>b.onclick=()=>{
+    document.getElementById('tutorialModal').classList.add('hidden');
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.code==='KeyE')interact();
+    if(e.code==='KeyF')eat();
+    if(e.code==='KeyG')drink();
+    if(e.code==='KeyN')breedNearest();
+    if(e.code==='KeyT')document.getElementById('tutorialModal').classList.toggle('hidden');
+  });
+
+  window.addEventListener('beforeunload',()=>{
+    try{
+      if(scene.running)saveGame();
+    }catch(e){}
+  });
+
+  /* Inventory modal */
+  const inv=document.createElement('div');
+  inv.id='invModal';
+  inv.className='modal hidden';
+  inv.innerHTML=`
+    <div class="modal-card wide">
+      <button class="close">X</button>
+      <h2>INVENTORY & CRAFTING</h2>
+      <h3>RESOURCES</h3>
+      <div class="inventory-grid" id="inventoryGrid"></div>
+      <h3>CRAFT</h3>
+      <div class="craft-grid">
+        <div class="craft"><span>CAMPFIRE</span><b>Warmth & cooking</b><button data-craft="campfire">8 wood • 4 stone</button></div>
+        <div class="craft"><span>SADDLE</span><b>Ride a tamed dinosaur</b><button data-craft="saddle">10 hide • 12 fiber • 5 wood</button></div>
+        <div class="craft"><span>FENCE</span><b>Animal enclosure</b><button data-craft="fence">12 wood</button></div>
+        <div class="craft"><span>GARDEN</span><b>Grow crops</b><button data-craft="garden">6 wood • 4 clay • 3 fiber</button></div>
+        <div class="craft"><span>BEACON</span><b>Explorer landmark</b><button data-craft="beacon">3 crystal • 8 stone</button></div>
+      </div>
+      <p id="craftLevel" class="tiny"></p>
+    </div>`;
+  document.body.appendChild(inv);
+
+  inv.querySelector('.close').onclick=()=>inv.classList.add('hidden');
+  inv.querySelectorAll('[data-craft]').forEach(b=>b.onclick=()=>craft(b.dataset.craft));
+
+  /* Map modal */
+  const map=document.createElement('div');
+  map.id='mapModal';
+  map.className='modal hidden';
+  map.innerHTML=`
+    <div class="modal-card">
+      <button class="close">X</button>
+      <h2>FRONTIER MAP</h2>
+      <canvas id="mapCanvas" width="600" height="600" style="width:100%;aspect-ratio:1;border-radius:14px;border:1px solid rgba(255,255,255,.1)"></canvas>
+      <p class="tiny">Green = you • bright markers = discovered landmarks.</p>
+    </div>`;
+  document.body.appendChild(map);
+  map.querySelector('.close').onclick=()=>map.classList.add('hidden');
+
+  /* Global early error display */
+  window.addEventListener('error',e=>{
+    console.error(e.error||e.message);
+    const fatal=document.getElementById('fatal');
+    const text=document.getElementById('fatalText');
+    if(fatal){
+      fatal.classList.remove('hidden');
+      if(text)text.textContent='Startup error: '+(e.message||'Unknown error');
+    }
+  });
+
+  window.addEventListener('unhandledrejection',e=>{
+    console.error(e.reason);
+    const fatal=document.getElementById('fatal');
+    const text=document.getElementById('fatalText');
+    if(fatal){
+      fatal.classList.remove('hidden');
+      if(text)text.textContent='Game error: '+(e.reason?.message||e.reason||'Unknown error');
+    }
+  });
+
+  /* Fatal screen */
+  const fatal=document.createElement('div');
+  fatal.id='fatal';
+  fatal.className='fatal hidden';
+  fatal.innerHTML=`
+    <div>
+      <h2>Dino Frontier could not start</h2>
+      <p id="fatalText">Try reloading the page.</p>
+      <button onclick="location.reload()">RELOAD GAME</button>
+    </div>`;
+  document.body.appendChild(fatal);
+
+  /* Boot test helper */
+  window.__DINO_FRONTIER__={
+    booted:true,
+    version:'single-file-1.0',
+    renderer:webglVersion===2?'WebGL2':'WebGL1',
+    worldReady:true
+  };
+
+  requestAnimationFrame(loop);
+</script>
+</body>
+</html>
+      
